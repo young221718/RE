@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -31,7 +32,7 @@ public class Client extends JFrame {
     static Client frame = new Client();
     
        JPanel contentPane;
-       JTextField txtPhinNum;
+       JTextField txtPinNum;
        JTextField textField;
 
         
@@ -46,24 +47,33 @@ public class Client extends JFrame {
               setContentPane(contentPane);
               contentPane.setLayout(null);
               
+              DragNDrop egg = new DragNDrop();
+              egg.ta.setIcon(new ImageIcon("R.PNG"));
+              egg.ta.setBounds(70, 20, 381, 434);
+              contentPane.add(egg.ta);
               
-              JLabel img = new JLabel();
-              img.setIcon(new ImageIcon("R.PNG"));
-              img.setBounds(70, 20, 381, 434);
-      		  contentPane.add(img);
-              
-              
-              JButton btnEntrance = new JButton("ENTRANCE");
+      		JTextArea textArea_1 = new JTextArea();
+    		textArea_1.setBounds(39, 493, 475, 113);
+    		contentPane.add(textArea_1);
+    		/*contentPane.add(new JScrollPane(textArea_1));
+    		textArea_1.setEditable(false);*/
+    		
+    		JButton btnSending = new JButton("Sending");  //파일 전송 버튼
+    		btnSending.setBounds(218, 446, 106, 27);
+    		contentPane.add(btnSending);
+      		  
+      		  
+              JButton btnEntrance = new JButton("ENTRANCE");//Pin번호가 맞으면-> 채팅방 입장
               btnEntrance.setBounds(558, 67, 106, 38);
               contentPane.add(btnEntrance);
               
-              txtPhinNum = new JTextField();
-              txtPhinNum.setBounds(676, 68, 232, 37);
-              txtPhinNum.setText("PHIN NUM");
-              contentPane.add(txtPhinNum);
-              txtPhinNum.setColumns(10);
+              txtPinNum = new JTextField();
+              txtPinNum.setBounds(676, 68, 232, 37);
+              txtPinNum.setText("Input Pin Number"); //Pin번호 입력하는 부분
+              contentPane.add(txtPinNum);
+              txtPinNum.setColumns(10);
               
-              JButton btnRoom = new JButton("ROOM");
+              JButton btnRoom = new JButton("ROOM");  //방 만들기 버튼
               btnRoom.setBounds(558, 20, 79, 40);
               btnRoom.addActionListener(new ActionListener() {
                  public void actionPerformed(ActionEvent arg0) {
@@ -80,24 +90,28 @@ public class Client extends JFrame {
               JTextArea textArea = new JTextArea();
               textArea.setEditable(false);
               textArea.setBounds(558, 117, 350, 444);
-              contentPane.add(textArea);
+              contentPane.add(textArea); //채팅이 보여지는 부분
+          	//contentPane.add(new JScrollPane(textArea_1));
+            //textArea.setEditable(false);
+              
+              /*JScrollPane scrollPane1 = new JScrollPane(textArea);
+              contentPane.add(scrollPane1);*/
+              
+              textField.addActionListener(new ActionListener() { /*문장 입력하는 부분*/
+                  public void actionPerformed(ActionEvent e) {
+                      out.println(textField.getText());
+                      textField.setText("");
+                  }
+              });
+              
               
               JTextArea txtrPn = new JTextArea();
               txtrPn.setEditable(false);
-              txtrPn.setText("PN");
+              txtrPn.setText("Showing Pin Number");
               txtrPn.setBounds(645, 20, 263, 38);
               contentPane.add(txtrPn);
            }
            
-
-   
-      
-      
-
-
-
-   
-   
    
    private String getServerAddress() {
         return JOptionPane.showInputDialog(
@@ -154,7 +168,7 @@ public class Client extends JFrame {
             socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
    
-      //이 밑으로는 프로톨콜 코드 필요
+      //이 밑으로는 프로토콜 코드 필요
       
       
    }
