@@ -1,0 +1,176 @@
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Random;
+
+import basic.Room;
+
+public class WaitingRoom extends Room {
+	private String userName;
+	private String eMail;
+	public static HashMap<Integer, ServerSocket> chatRoomServerSockets = new HashMap<Integer, ServerSocket>();
+	private static final int PROTOCOL_NUMBER = 10;
+
+	WaitingRoom(Socket socket) {
+		super(socket);
+	}
+
+	public void run() {
+		try {
+			System.out.println("Enter Waiting Room");
+			// TODO : 로그인 정보를 받고 올바르면 탈출
+			while (true) {
+				break; // 쓰레기 코드
+			}
+
+			// 사용자가 waiting room에서 하는 일을 확인
+			// 소켓이 연결되어 있을 때까지 유지된다.
+			while (roomSocket.isConnected()) {
+				fromClient = new DataInputStream(roomSocket.getInputStream());
+				toClient = new ObjectOutputStream(roomSocket.getOutputStream());
+
+				// for test
+				int temp = fromClient.readInt();
+				System.out.println(temp);
+				System.out.println("test");
+				
+				
+				
+				
+				
+				protocol = fromClient.read();
+
+				// protocol
+				// 1 : 방을 만들고 싶다.
+				// 2 : 방에 들어가고 싶다.
+				if (1 == protocol) { // Make the room
+					// 만들 방의 옵션을 받아오고, 올바른지 확인한다.
+					// TODO : 서버에서 체크할건지, 클라이언트에서 체크할건지 생각해 보자
+					//RoomInformation roomInfor = (RoomInformation) fromClient.readObject();
+
+					// 방 만들기 --> 서버 소켓을 만들어 놓는다.
+					// 방 만들기를 요청한 클라이언트에게 핀번호를 전송해준다.
+					try {
+						int roomNumber = makeChatRoom();
+						toClient.writeInt(roomNumber);
+						System.out.println(roomNumber + " room made");
+					} catch (Exception e) {
+						// TODO : 오류 프로토콜 처리해야한다!!!!!!
+						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
+					}
+
+				} else if (2 == protocol) { // Enter the room
+					int PIN = fromClient.read();
+					enterChatRoom(PIN);
+
+				} else {
+					/*
+					 * 예외 처리
+					 */
+				}
+			}
+
+		} catch (Exception e) {
+			/*
+			 * 클래스 캐스팅 오류
+			 */
+
+		} finally {
+		}
+		/*
+		 * 사용자 로그 아웃 시켜야함
+		 */
+		try {
+			roomSocket.close();
+		} catch (IOException e) {
+
+		}
+	}
+
+
+
+	/**
+	 * logIn
+	 * 
+	 * 이 함수는 첫 화면에서 사용자의 이메일과 이름을 받는 함수이다. 이메일은 유니크해야하며, 같은 이메일이 2개가 동시에 들어 올 수 없게
+	 * 해야한다.
+	 * 
+	 * @return : 로그인이 성공적으로 되었으면 true를 리턴, 다른 오류가 있을 경우 false 를 리턴한다.
+	 */
+	private boolean logIn() {
+
+		return true;
+
+	}
+
+	/**
+	 * makeRoom
+	 * 
+	 * 이 함수는 사용자가 방 만들기 버튼을 누르고, 올바른 옵션을 입력한 후 채팅방의 서버소켓을 할당하는 함수 이다. 유니크한 핀번호를 가지게
+	 * 될때 까지 핀 번호를 할당을 시도한다.
+	 * 
+	 * @return : 채팅방의 PIN 번호를 리턴해준다. (채팅방의 PIN 번호는 홀수이다.)
+	 */
+	private int makeChatRoom() throws Exception {
+		int PIN;
+
+		PIN = makePIN();
+		synchronized (chatRoomServerSockets) {
+			do {
+				PIN = makePIN();
+			} while (!chatRoomServerSockets.containsKey(PIN));
+			ServerSocket tempSS = new ServerSocket(PIN);
+			chatRoomServerSockets.put(PIN, tempSS);
+		}
+		return PIN;
+	}
+
+	/**
+	 * enterChatRoom
+	 * 
+	 * 이 함수는 사용자가 PIN 번호를 입력하고 방에 들었가기를 눌렀을 때 사용될 함수이다. 사용자가 올바른 PIN 번호를 입력했을 때만 방으로
+	 * 연결해 준다.
+	 * 
+	 * @param PIN
+	 *            - 들어가고 싶은 채팅방의 핀번호
+	 * @return 오류 없이 방에 들어갔으면 true를 리턴해준다.
+	 */
+	private static boolean enterChatRoom(int PIN) {
+		if (chatRoomServerSockets.containsKey(PIN)) {
+			try {
+				new ChatRoom(chatRoomServerSockets.get(PIN).accept()).start();
+				return true;
+			} catch (Exception e) {
+				
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * makePIN
+	 * 
+	 * 올바른 핀번호를 램던으로 할당해 준다.
+	 * 
+	 * @return 10이상에서 100000 미만의 숫자 중 할당되지 않은 번호를 리턴한다.
+	 */
+	private static int makePIN() {
+		Random random = new Random();
+		int PIN = random.nextInt(100000);
+
+		if (PIN % 2 == 0)
+			PIN = PIN + 1;
+		while (PIN > PROTOCOL_NUMBER && !chatRoomServerSockets.containsKey(PIN)) {
+			PIN = random.nextInt();
+			if (PIN % 2 == 0)
+				PIN = PIN + 1;
+		}
+
+		return PIN;
+	}
+
+}
