@@ -10,7 +10,6 @@ public class ReServer {
 		System.out.println("The RE server os running.");
 		ServerSocket listener = new ServerSocket(PORT);
 		try {
-			
 			while(true) {
 				new WaitingRoom(listener.accept()).start();
 			}

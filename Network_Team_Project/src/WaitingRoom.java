@@ -27,21 +27,24 @@ public class WaitingRoom extends Room {
 				break; // 쓰레기 코드
 			}
 
+			
+			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
+			fromClient = new ObjectInputStream(roomSocket.getInputStream());
+
+			// for test
+			System.out.println("Test it");
+			System.out.println((String) fromClient.readObject());
+			toClient.writeObject("Message: return");
+			
+			// Communication cm = (Communication)fromClient.readObject();
+			// Communication res = new Communication("Okay");
+			// toClient.writeObject(res);
+			// toClient.flush();
 			// 사용자가 waiting room에서 하는 일을 확인
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
 
-				toClient = new ObjectOutputStream(roomSocket.getOutputStream());
-				fromClient = new ObjectInputStream(roomSocket.getInputStream());
-
-				// for test
-				System.out.println("Test it");
-				System.out.println((String) fromClient.readObject());
-				toClient.writeObject("Message: return");
-				// Communication cm = (Communication)fromClient.readObject();
-				// Communication res = new Communication("Okay");
-				// toClient.writeObject(res);
-				// toClient.flush();
+				
 
 				protocol = (Integer) fromClient.readObject();
 				System.out.println("protocol: " + protocol);
@@ -67,9 +70,11 @@ public class WaitingRoom extends Room {
 						// TODO : 오류 프로토콜 처리해야한다!!!!!!
 						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
 					}
+					System.out.println("End 111");
 
 				} else if (222 == protocol) { // Enter the room
-					int PIN = fromClient.read();
+					System.out.println("Enter protocol 222");
+					int PIN = (Integer) fromClient.readObject();
 					enterChatRoom(PIN);
 
 				} else {
@@ -79,9 +84,13 @@ public class WaitingRoom extends Room {
 				}
 			}
 
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO: handle exception
+			e.printStackTrace();
 		} catch (Exception e) {
-			System.out.println("Exception........");
-
+			e.printStackTrace();
 		} finally {
 		}
 		/*
@@ -123,11 +132,11 @@ public class WaitingRoom extends Room {
 		synchronized (chatRoomServerSockets) {
 
 			PIN = makePIN();
-			if(chatRoomServerSockets.containsKey((Integer)PIN)) {
+			if (chatRoomServerSockets.containsKey((Integer) PIN)) {
 				System.out.println("eeeeeeaaaaak");
 			}
 			ServerSocket tempSS = new ServerSocket(PIN);
-			
+
 			chatRoomServerSockets.put(PIN, tempSS);
 		}
 		System.out.println("end makeChatRoom");
@@ -148,11 +157,13 @@ public class WaitingRoom extends Room {
 		if (chatRoomServerSockets.containsKey(PIN)) {
 			try {
 				new ChatRoom(chatRoomServerSockets.get(PIN).accept()).start();
+				System.out.println("enterChatroom very good");
 				return true;
 			} catch (Exception e) {
-
+				System.out.println("Error in enterChatroom");
 			}
 		}
+		System.out.println("FFFFFFFFFF");
 		return false;
 	}
 
@@ -165,10 +176,10 @@ public class WaitingRoom extends Room {
 	 */
 	private static int makePIN() {
 		int PIN;
-		
+
 		synchronized (ROOMPIN) {
-			PIN =ROOMPIN;
-			ROOMPIN+=2;
+			PIN = ROOMPIN;
+			ROOMPIN += 2;
 		}
 		System.out.println("End makePin");
 		return PIN;

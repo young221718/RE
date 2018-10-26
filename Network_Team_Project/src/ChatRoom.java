@@ -3,16 +3,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import basic.Room;
 import java.util.HashMap;
 
+import basic.Room;
 
-<natures>
-<nature>org.eclipse.jdt.core.javanature</nature>
-</natures>
+
+
 public class ChatRoom extends Room{
 	
-	private static HashMap
+	private static HashMap<Integer, PrintWriter> broadcaster = new HashMap<Integer, PrintWriter>();
 	
 	public ChatRoom(Socket socket) {
 		super(socket);
@@ -22,35 +21,52 @@ public class ChatRoom extends Room{
 		portNumber = port;
 		Name = user;
 		Email = email;
+		
 	}
 	
 	public void run(){
-		System.out.println("Enter chat room");
+		System.out.println("!!!!!Enter chat room!!!!!");
 		try {
 
 			// Create character streams for the socket.
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			
-			
-			
-				
+			for(int i=0;i<10;i++) {
+				int input = (Integer)fromClient.readObject();
+				String message = "from chatServer" + input;
+				toClient.writeObject(message);
 			}
+			
+//			synchronized (broadcaster) {
+//				broadcaster.put(portNumber, out);
+//			}
+//			
+//			while(true) {
+//				String input = in.readLine();
+//				if(input == null)
+//					return;
+//				
+//				for(PrintWriter writer: broadcaster.values()) {
+//					writer.println(input);
+//				}
+//			
+//				
+//			}
 		} catch (IOException e) {
 			System.out.println(e);
-			// Notice to every client
-			// a client exit chat room
-			for (PrintWriter writer : nameAndWriter.values()) {
-				writer.println("NOTICE ***[" + name + "] exit chat room.***");
-			}
-		} finally {
+			
+		}catch (Exception e) {
+			// TODO: handle exception
+		} 
+		finally {
 			// This client is going down! Remove its name and its print
 			// writer from the sets, and close its socket.
-			if (name != null) {
-				nameAndWriter.remove(name);
-			}
+//			if (name != null) {
+//				nameAndWriter.remove(name);
+//			}
 			try {
-				socket.close();
+				roomSocket.close();
 			} catch (IOException e) {
 			}
 		}

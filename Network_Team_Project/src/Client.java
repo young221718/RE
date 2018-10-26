@@ -16,7 +16,7 @@ public class Client {
 			ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
 			
 			System.out.println("client test");
-			String message = "This is message from client";
+			
 			
 			
 			// 잘 되는지 테스트 하는거
@@ -36,9 +36,25 @@ public class Client {
 			out.writeObject(pro);
 			out.flush();
 			
+			Socket chatSocket = new Socket(host, roomNum);
+			System.out.println(3);
+			ObjectInputStream cin = new ObjectInputStream(chatSocket.getInputStream());
+			ObjectOutputStream cout = new ObjectOutputStream(chatSocket.getOutputStream());
+			
+			System.out.println(4);
+			for(int i=0;i<10;i++) {
+				System.out.println("gggg"+i);
+				cout.writeObject((Integer)i);
+				cout.flush();
+				System.out.println("!");
+				System.out.println((String)cin.readObject());
+			}
+			
+			
 			
 			out.close();
 			in.close();
+			chatSocket.close();
 			clientSocket.close();
 			
 		} catch (Exception e) {
