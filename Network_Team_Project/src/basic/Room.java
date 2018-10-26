@@ -11,6 +11,8 @@ public abstract class Room extends Thread{
 	protected ObjectOutputStream toClient;
 	protected int portNumber;
 	protected int protocol;
+	protected String Email;
+	protected String Name;
 	
 	public Room(Socket socket){
 		this.roomSocket = socket;

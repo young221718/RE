@@ -31,6 +31,10 @@ public class Client {
 			int roomNum = (Integer)in.readObject();
 			System.out.println("Room: "+ roomNum);
 			
+			// 방들어가기
+			pro = new Integer(222);
+			out.writeObject(pro);
+			out.flush();
 			
 			
 			out.close();

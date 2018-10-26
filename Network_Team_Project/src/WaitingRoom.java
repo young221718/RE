@@ -5,7 +5,6 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.Random;
 
 import basic.Room;
 
@@ -13,6 +12,7 @@ public class WaitingRoom extends Room {
 	private String userName;
 	private String eMail;
 	public static HashMap<Integer, ServerSocket> chatRoomServerSockets = new HashMap<Integer, ServerSocket>();
+	private static Integer ROOMPIN = new Integer(10000);
 	private static final int PROTOCOL_NUMBER = 10;
 
 	WaitingRoom(Socket socket) {
@@ -30,25 +30,20 @@ public class WaitingRoom extends Room {
 			// 사용자가 waiting room에서 하는 일을 확인
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
-				
+
 				toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 				fromClient = new ObjectInputStream(roomSocket.getInputStream());
-				
 
 				// for test
 				System.out.println("Test it");
-				System.out.println((String)fromClient.readObject());
+				System.out.println((String) fromClient.readObject());
 				toClient.writeObject("Message: return");
-//				Communication cm = (Communication)fromClient.readObject();
-//				Communication res = new Communication("Okay");
-//				toClient.writeObject(res);
-//				toClient.flush();
-				
-				
-				
-				
-				
-				protocol = (Integer)fromClient.readObject();
+				// Communication cm = (Communication)fromClient.readObject();
+				// Communication res = new Communication("Okay");
+				// toClient.writeObject(res);
+				// toClient.flush();
+
+				protocol = (Integer) fromClient.readObject();
 				System.out.println("protocol: " + protocol);
 				// protocol
 				// 1 : 방을 만들고 싶다.
@@ -56,7 +51,7 @@ public class WaitingRoom extends Room {
 				if (111 == protocol) { // Make the room
 					// 만들 방의 옵션을 받아오고, 올바른지 확인한다.
 					// TODO : 서버에서 체크할건지, 클라이언트에서 체크할건지 생각해 보자
-					//RoomInformation roomInfor = (RoomInformation) fromClient.readObject();
+					// RoomInformation roomInfor = (RoomInformation) fromClient.readObject();
 
 					// 방 만들기 --> 서버 소켓을 만들어 놓는다.
 					// 방 만들기를 요청한 클라이언트에게 핀번호를 전송해준다.
@@ -67,13 +62,13 @@ public class WaitingRoom extends Room {
 						toClient.writeObject(roomNumber);
 						toClient.flush();
 						System.out.println(roomNumber + " room made");
-						
+
 					} catch (Exception e) {
 						// TODO : 오류 프로토콜 처리해야한다!!!!!!
 						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
 					}
 
-				} else if (2 == protocol) { // Enter the room
+				} else if (222 == protocol) { // Enter the room
 					int PIN = fromClient.read();
 					enterChatRoom(PIN);
 
@@ -85,9 +80,7 @@ public class WaitingRoom extends Room {
 			}
 
 		} catch (Exception e) {
-			/*
-			 * 클래스 캐스팅 오류
-			 */
+			System.out.println("Exception........");
 
 		} finally {
 		}
@@ -101,8 +94,6 @@ public class WaitingRoom extends Room {
 		}
 		System.out.println("End Watiing Room");
 	}
-
-
 
 	/**
 	 * logIn
@@ -130,10 +121,13 @@ public class WaitingRoom extends Room {
 		int PIN;
 		System.out.println("Enter makeChatRoom");
 		synchronized (chatRoomServerSockets) {
-			do {
-				PIN = makePIN();
-			} while (!chatRoomServerSockets.containsKey(PIN));
+
+			PIN = makePIN();
+			if(chatRoomServerSockets.containsKey((Integer)PIN)) {
+				System.out.println("eeeeeeaaaaak");
+			}
 			ServerSocket tempSS = new ServerSocket(PIN);
+			
 			chatRoomServerSockets.put(PIN, tempSS);
 		}
 		System.out.println("end makeChatRoom");
@@ -156,7 +150,7 @@ public class WaitingRoom extends Room {
 				new ChatRoom(chatRoomServerSockets.get(PIN).accept()).start();
 				return true;
 			} catch (Exception e) {
-				
+
 			}
 		}
 		return false;
@@ -170,15 +164,11 @@ public class WaitingRoom extends Room {
 	 * @return 10이상에서 100000 미만의 숫자 중 할당되지 않은 번호를 리턴한다.
 	 */
 	private static int makePIN() {
-		Random random = new Random();
-		int PIN = random.nextInt(100000);
-
-		if (PIN % 2 == 0)
-			PIN = PIN + 1;
-		while (PIN > PROTOCOL_NUMBER && !chatRoomServerSockets.containsKey(PIN)) {
-			PIN = random.nextInt();
-			if (PIN % 2 == 0)
-				PIN = PIN + 1;
+		int PIN;
+		
+		synchronized (ROOMPIN) {
+			PIN =ROOMPIN;
+			ROOMPIN+=2;
 		}
 		System.out.println("End makePin");
 		return PIN;
