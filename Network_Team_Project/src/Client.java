@@ -18,13 +18,20 @@ public class Client {
 			System.out.println("client test");
 			String message = "This is message from client";
 			
-			//Communication cm = new Communication("Client Request.");
 			
+			// 잘 되는지 테스트 하는거
 			out.writeObject("Message: 12345");
 			out.flush();
 			System.out.println((String)in.readObject());
-//			Communication re = (Communication)in.readObject();
-//			System.out.println(re);
+
+			// 방만들기
+			Integer pro = new Integer(111);
+			out.writeObject(pro);
+			out.flush();
+			int roomNum = (Integer)in.readObject();
+			System.out.println("Room: "+ roomNum);
+			
+			
 			
 			out.close();
 			in.close();

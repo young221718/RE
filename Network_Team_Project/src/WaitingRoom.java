@@ -48,12 +48,12 @@ public class WaitingRoom extends Room {
 				
 				
 				
-				protocol = fromClient.read();
-
+				protocol = (Integer)fromClient.readObject();
+				System.out.println("protocol: " + protocol);
 				// protocol
 				// 1 : 방을 만들고 싶다.
 				// 2 : 방에 들어가고 싶다.
-				if (1 == protocol) { // Make the room
+				if (111 == protocol) { // Make the room
 					// 만들 방의 옵션을 받아오고, 올바른지 확인한다.
 					// TODO : 서버에서 체크할건지, 클라이언트에서 체크할건지 생각해 보자
 					//RoomInformation roomInfor = (RoomInformation) fromClient.readObject();
@@ -61,9 +61,13 @@ public class WaitingRoom extends Room {
 					// 방 만들기 --> 서버 소켓을 만들어 놓는다.
 					// 방 만들기를 요청한 클라이언트에게 핀번호를 전송해준다.
 					try {
+						System.out.println("Enter protocol 111");
 						int roomNumber = makeChatRoom();
-						toClient.writeInt(roomNumber);
+						System.out.println("TT");
+						toClient.writeObject(roomNumber);
+						toClient.flush();
 						System.out.println(roomNumber + " room made");
+						
 					} catch (Exception e) {
 						// TODO : 오류 프로토콜 처리해야한다!!!!!!
 						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
@@ -124,8 +128,7 @@ public class WaitingRoom extends Room {
 	 */
 	private int makeChatRoom() throws Exception {
 		int PIN;
-
-		PIN = makePIN();
+		System.out.println("Enter makeChatRoom");
 		synchronized (chatRoomServerSockets) {
 			do {
 				PIN = makePIN();
@@ -133,6 +136,7 @@ public class WaitingRoom extends Room {
 			ServerSocket tempSS = new ServerSocket(PIN);
 			chatRoomServerSockets.put(PIN, tempSS);
 		}
+		System.out.println("end makeChatRoom");
 		return PIN;
 	}
 
@@ -176,7 +180,7 @@ public class WaitingRoom extends Room {
 			if (PIN % 2 == 0)
 				PIN = PIN + 1;
 		}
-
+		System.out.println("End makePin");
 		return PIN;
 	}
 
