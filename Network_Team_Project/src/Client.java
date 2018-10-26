@@ -1,5 +1,6 @@
-import java.io.DataOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class Client {
@@ -8,22 +9,32 @@ public class Client {
 		// TODO Auto-generated method stub
 		try {
 			System.out.println("print!");
-			Socket clientSocket = new Socket("127.0.0.1", 1234);
+			InetAddress host = InetAddress.getLocalHost();
+			Socket clientSocket = new Socket(host, 1234);
 
 			ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-			DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
+			ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
 			
 			System.out.println("client test");
 			String message = "This is message from client";
-			out.writeInt(7777);
-			System.out.println("end");
 			
+			//Communication cm = new Communication("Client Request.");
+			
+			out.writeObject("Message: 12345");
+			out.flush();
+			System.out.println((String)in.readObject());
+//			Communication re = (Communication)in.readObject();
+//			System.out.println(re);
+			
+			out.close();
+			in.close();
 			clientSocket.close();
 			
 		} catch (Exception e) {
 			System.out.println("Error");
 		}
 		
+		System.out.println("Client End");
 	}
 
 }

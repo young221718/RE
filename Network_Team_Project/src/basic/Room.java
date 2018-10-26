@@ -1,5 +1,5 @@
 package basic;
-import java.io.DataInputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,7 +7,7 @@ import java.net.Socket;
 public abstract class Room extends Thread{
 	protected ServerSocket welcomeSocket;
 	protected Socket roomSocket;
-	protected DataInputStream fromClient;
+	protected ObjectInputStream fromClient;
 	protected ObjectOutputStream toClient;
 	protected int portNumber;
 	protected int protocol;

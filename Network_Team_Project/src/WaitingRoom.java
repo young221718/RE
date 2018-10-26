@@ -1,6 +1,6 @@
 
-import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -30,13 +30,19 @@ public class WaitingRoom extends Room {
 			// 사용자가 waiting room에서 하는 일을 확인
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
-				fromClient = new DataInputStream(roomSocket.getInputStream());
+				
 				toClient = new ObjectOutputStream(roomSocket.getOutputStream());
+				fromClient = new ObjectInputStream(roomSocket.getInputStream());
+				
 
 				// for test
-				int temp = fromClient.readInt();
-				System.out.println(temp);
-				System.out.println("test");
+				System.out.println("Test it");
+				System.out.println((String)fromClient.readObject());
+				toClient.writeObject("Message: return");
+//				Communication cm = (Communication)fromClient.readObject();
+//				Communication res = new Communication("Okay");
+//				toClient.writeObject(res);
+//				toClient.flush();
 				
 				
 				
@@ -89,6 +95,7 @@ public class WaitingRoom extends Room {
 		} catch (IOException e) {
 
 		}
+		System.out.println("End Watiing Room");
 	}
 
 
