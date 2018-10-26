@@ -25,7 +25,7 @@ public class ChatRoom extends Room{
 	}
 	
 	public void run(){
-		System.out.println("!!!!!Enter chat room!!!!!");
+		System.out.println("Enter chat room");
 		try {
 
 			// Create character streams for the socket.

@@ -19,9 +19,4 @@ public abstract class Room extends Thread{
 	}
 	
 	
-//	public abstract boolean EnterRoom(int portNum);
-//	
-//	public abstract boolean MakeRoom(int portNum);
-//	
-	
 }
