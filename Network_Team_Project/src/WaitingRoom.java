@@ -10,12 +10,11 @@ import basic.Room;
 import basic.RoomInformation;
 
 public class WaitingRoom extends Room {
-	
+
 	public static HashMap<Integer, ServerSocket> chatRoomServerSockets = new HashMap<Integer, ServerSocket>();
 	public static HashMap<Integer, ServerSocket> fileRoomServerSockets = new HashMap<Integer, ServerSocket>();
-	
+
 	private static Integer ROOMPIN = new Integer(10000);
-	private static final int PROTOCOL_NUMBER = 10;
 
 	WaitingRoom(Socket socket) {
 		super(socket);
@@ -29,17 +28,14 @@ public class WaitingRoom extends Room {
 				break; // 쓰레기 코드
 			}
 
-			
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 
-			
 			// 사용자가 waiting room에서 하는 일을 확인
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
-				
-				while(fromClient.available() > 0);
-				protocol = (Integer) fromClient.readObject();
+
+				protocol = (Integer) fromClient.readInt();
 				System.out.println("protocol: " + protocol);
 				// protocol
 				// 111 : 방을 만들고 싶다.
@@ -49,13 +45,12 @@ public class WaitingRoom extends Room {
 					// TODO : 서버에서 체크할건지, 클라이언트에서 체크할건지 생각해 보자
 					roomInfor = (RoomInformation) fromClient.readObject();
 					roomInfor.print();
-					
-					
+
 					// 방 만들기 --> 서버 소켓을 만들어 놓는다.
 					// 방 만들기를 요청한 클라이언트에게 핀번호를 전송해준다.
 					try {
 						System.out.println("Enter protocol 111");
-						int roomNumber = makeChatRoom(roomInfor);
+						int roomNumber = makeChatRoom();
 						toClient.writeObject(roomNumber);
 						toClient.flush();
 						System.out.println(roomNumber + " room made");
@@ -68,32 +63,37 @@ public class WaitingRoom extends Room {
 
 				} else if (222 == protocol) { // Enter the room
 					System.out.println("Enter protocol 222");
-					int PIN = (Integer)fromClient.readObject();
+					int PIN = (Integer) fromClient.readObject();
 					System.out.println("Enter room Pin in " + PIN);
 					enterChatRoom(PIN);
 
+				} else if (888 == protocol) {
+					toClient.close();
+					fromClient.close();
+					break;
 				} else {
 					// TODO : 프로토콜 예외 처리해야함.
 				}
 			}
 
 		} catch (ClassNotFoundException e) {
+			System.out.println("Error 1");
 			e.printStackTrace();
 		} catch (IOException e) {
+			System.out.println("Error 2");
 			e.printStackTrace();
 		} catch (Exception e) {
+			System.out.println("Error 3");
 			e.printStackTrace();
 		} finally {
-			/*
-			 * 사용자 로그 아웃 시켜야함
-			 */
 			try {
-				roomSocket.close();
+				if (!roomSocket.isClosed())
+					roomSocket.close();
 			} catch (IOException e) {
 
 			}
 		}
-		
+
 		System.out.println("End Watiing Room");
 	}
 
@@ -111,6 +111,8 @@ public class WaitingRoom extends Room {
 
 	}
 
+	// For ChatRoom
+	// ============================================================================================
 	/**
 	 * makeRoom
 	 * 
@@ -125,11 +127,11 @@ public class WaitingRoom extends Room {
 		synchronized (chatRoomServerSockets) {
 			PIN = makePIN();
 			if (chatRoomServerSockets.containsKey((Integer) PIN)) {
-				System.out.println("Already Exist");
+				System.out.println("Already Exist - ChatRoom:" + PIN);
 			}
 			ServerSocket tempSS = new ServerSocket(PIN);
-			rf.port = PIN;
-			chatRoomServerSockets.put(rf, tempSS);
+			roomInfor.port = PIN;
+			chatRoomServerSockets.put(PIN, tempSS);
 		}
 		System.out.println("end makeChatRoom");
 		return PIN;
@@ -141,14 +143,15 @@ public class WaitingRoom extends Room {
 	 * 이 함수는 사용자가 PIN 번호를 입력하고 방에 들었가기를 눌렀을 때 사용될 함수이다. 사용자가 올바른 PIN 번호를 입력했을 때만 방으로
 	 * 연결해 준다.
 	 * 
-	 * @param PIN: 들어가고 싶은 채팅방의 핀번호
+	 * @param PIN:
+	 *            들어가고 싶은 채팅방의 핀번호
 	 * @return 오류 없이 방에 들어갔으면 true를 리턴해준다.
 	 */
 	private static boolean enterChatRoom(int PIN) {
 		if (chatRoomServerSockets.containsKey(PIN)) {
 			try {
-				new ChatRoom(chatRoomServerSockets.get().accept(),PIN,"user1","user@naver.com").start();
-				new ChatRoom(chatRoomServerSockets.get)
+				new ChatRoom(chatRoomServerSockets.get(PIN).accept()).start();
+
 				System.out.println("Method enterChatroom successed");
 				return true;
 			} catch (Exception e) {
@@ -157,62 +160,64 @@ public class WaitingRoom extends Room {
 		}
 		return false;
 	}
+	// End ChatRoom
+	// Method=======================================================================================
 
+	// 파일룸
+	/**
+	 * makeFileRoom
+	 * 
+	 * 이 함수는 사용자가 방 만들기 버튼을 누르고, 올바른 옵션을 입력한 후 채팅방의 서버소켓을 할당하는 함수 이다. 유니크한 핀번호를 가지게
+	 * 될때 까지 핀 번호를 할당을 시도한다.
+	 * 
+	 * @return : 파일룸의 PIN 번호를 리턴해준다. (채팅방의 PIN 번호는 짝수이다.)
+	 */
+	private int makeFileRoom() throws Exception {
+		int PIN;
+		System.out.println("Enter makeFileRoom");
+		synchronized (fileRoomServerSockets) {
 
-	   // 파일룸
-	   /**
-	    * makeFileRoom
-	    * 
-	    * 이 함수는 사용자가 방 만들기 버튼을 누르고, 올바른 옵션을 입력한 후 채팅방의 서버소켓을 할당하는 함수 이다. 유니크한 핀번호를 가지게
-	    * 될때 까지 핀 번호를 할당을 시도한다.
-	    * 
-	    * @return : 파일룸의 PIN 번호를 리턴해준다. (채팅방의 PIN 번호는 짝수이다.)
-	    */
-	   private int makeFileRoom() throws Exception {
-	      int PIN;
-	      System.out.println("Enter makeFileRoom");
-	      synchronized (fileRoomServerSockets) {
+			PIN = makePIN() + 1;
+			if (fileRoomServerSockets.containsKey((Integer) PIN)) {
+				System.out.println("eeeeeeaaaaak - file");
+			}
+			ServerSocket tempSV = new ServerSocket(PIN);
 
-	         PIN = makePIN()+1;
-	         if (fileRoomServerSockets.containsKey((Integer) PIN)) {
-	            System.out.println("eeeeeeaaaaak - file");
-	         }
-	         ServerSocket tempSV = new ServerSocket(PIN);
+			fileRoomServerSockets.put(PIN, tempSV);
+		}
+		System.out.println("end makeFileRoom");
+		return PIN;
+	}
 
-	         fileRoomServerSockets.put(PIN, tempSV);
-	      }
-	      System.out.println("end makeFileRoom");
-	      return PIN;
-	   }
+	/**
+	 * enterFileRoom
+	 * 
+	 * 이 함수는 사용자가 PIN 번호를 입력하고 방에 들었가기를 눌렀을 때 사용될 함수이다. 사용자가 올바른 PIN 번호를 입력했을 때만 방으로
+	 * 연결해 준다.
+	 * 
+	 * @param PIN
+	 *            - 들어가고 싶은 채팅방의 핀번호
+	 * @return 오류 없이 방에 들어갔으면 true를 리턴해준다.
+	 */
+	private static boolean enterFileRoom(int PIN) {
+		if (fileRoomServerSockets.containsKey(PIN)) {
+			try {
+				new ChatRoom(fileRoomServerSockets.get(PIN).accept()).start();
+				System.out.println("enterFileroom very good");
+				return true;
+			} catch (Exception e) {
+				System.out.println("Error in enterFileroom");
+			}
+		}
+		System.out.println("FFFFFFFFFF - file");
+		return false;
+	}
 
-	   /**
-	    * enterFileRoom
-	    * 
-	    * 이 함수는 사용자가 PIN 번호를 입력하고 방에 들었가기를 눌렀을 때 사용될 함수이다. 사용자가 올바른 PIN 번호를 입력했을 때만 방으로
-	    * 연결해 준다.
-	    * 
-	    * @param PIN
-	    *            - 들어가고 싶은 채팅방의 핀번호
-	    * @return 오류 없이 방에 들어갔으면 true를 리턴해준다.
-	    */
-	   private static boolean enterFileRoom(int PIN) {
-	      if (fileRoomServerSockets.containsKey(PIN)) {
-	         try {
-	            new ChatRoom(fileRoomServerSockets.get(PIN).accept()).start();
-	            System.out.println("enterFileroom very good");
-	            return true;
-	         } catch (Exception e) {
-	            System.out.println("Error in enterFileroom");
-	         }
-	      }
-	      System.out.println("FFFFFFFFFF - file");
-	      return false;
-	   }
-	   
 	/**
 	 * makePIN
 	 * 
 	 * 올바른 핀번호를 램던으로 할당해 준다.
+	 * 
 	 * @return 10이상에서 100000 미만의 숫자 중 할당되지 않은 번호를 리턴한다.
 	 */
 	private static int makePIN() {
