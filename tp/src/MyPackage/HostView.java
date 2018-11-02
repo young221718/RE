@@ -132,7 +132,12 @@ public class HostView extends JFrame {
                //각각의 텍스트 Area에 입력된 값을 받아올경우엔 .getText() 등을 사용한다.(ex secQText.getText)
                // combo박스 (인원수)를 받아올때는 joinNum.getSelectedItem() 이 사용
                
-               
+            	btnConfirm.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						
+						
+					}
+            	});
                
                main.disposeHost();// 현재 confirm 눌렀을때 창 사라지는 disposeHost가 등록되어있다. 이위에다 전송하는 코드 넣어야함
                

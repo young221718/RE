@@ -28,6 +28,7 @@ public class Client {
 			out.flush();
 			out.writeObject(roomNum);
 			
+			
 			// 채팅방의 소켓, in, out 연결하기
 			Socket chatSocket = new Socket(host, roomNum);
 			ObjectOutputStream cout = new ObjectOutputStream(chatSocket.getOutputStream());
