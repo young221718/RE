@@ -1,7 +1,8 @@
 package basic;
+import java.io.Serializable;
 import java.util.Calendar;
 
-public class RoomInformation {
+public class RoomInformation implements Serializable{
 	public String groupName;
 	public int port;
 	public int howManyPeople;
@@ -22,6 +23,13 @@ public class RoomInformation {
 		this.securityAnswer = SA;
 		this.securityQuestion = SQ;
 		this.endDate = endDate;
+	}
+	public void print() {
+		System.out.println("Group Name: " + groupName);
+		System.out.println("Port: " + port);
+		System.out.println("People: " + howManyPeople);
+		System.out.println("Question: " + securityQuestion);
+		System.out.println("Answer: " + securityAnswer);
 	}
 }
 

@@ -31,11 +31,11 @@ public class ChatRoom extends Room{
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			
-			for(int i=0;i<10;i++) {
-				int input = (Integer)fromClient.readObject();
-				String message = "from chatServer" + input;
-				toClient.writeObject(message);
-			}
+//			for(int i=0;i<10;i++) {
+//				int input = (Integer)fromClient.readObject();
+//				String message = "from chatServer" + input;
+//				toClient.writeObject(message);
+//			}
 			
 			synchronized (broadcaster) {
 				broadcaster.put(portNumber, toClient);
