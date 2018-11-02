@@ -7,12 +7,13 @@ import java.net.Socket;
 import java.util.HashMap;
 
 import basic.Room;
+import basic.RoomInformation;
 
 public class WaitingRoom extends Room {
-	private String userName;
-	private String eMail;
+	
 	public static HashMap<Integer, ServerSocket> chatRoomServerSockets = new HashMap<Integer, ServerSocket>();
 	public static HashMap<Integer, ServerSocket> fileRoomServerSockets = new HashMap<Integer, ServerSocket>();
+	
 	private static Integer ROOMPIN = new Integer(10000);
 	private static final int PROTOCOL_NUMBER = 10;
 
@@ -46,20 +47,22 @@ public class WaitingRoom extends Room {
 				if (111 == protocol) { // Make the room
 					// 만들 방의 옵션을 받아오고, 올바른지 확인한다.
 					// TODO : 서버에서 체크할건지, 클라이언트에서 체크할건지 생각해 보자
-					// RoomInformation roomInfor = (RoomInformation) fromClient.readObject();
-
+					roomInfor = (RoomInformation) fromClient.readObject();
+					roomInfor.print();
+					
+					
 					// 방 만들기 --> 서버 소켓을 만들어 놓는다.
 					// 방 만들기를 요청한 클라이언트에게 핀번호를 전송해준다.
 					try {
 						System.out.println("Enter protocol 111");
-						int roomNumber = makeChatRoom();
+						int roomNumber = makeChatRoom(roomInfor);
 						toClient.writeObject(roomNumber);
 						toClient.flush();
 						System.out.println(roomNumber + " room made");
-
 					} catch (Exception e) {
 						// TODO : 오류 프로토콜 처리해야한다!!!!!!
 						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
+						e.printStackTrace();
 					}
 					System.out.println("End Protocol 111");
 
@@ -122,10 +125,11 @@ public class WaitingRoom extends Room {
 		synchronized (chatRoomServerSockets) {
 			PIN = makePIN();
 			if (chatRoomServerSockets.containsKey((Integer) PIN)) {
-				System.out.println("eeeeeeaaaaak");
+				System.out.println("Already Exist");
 			}
 			ServerSocket tempSS = new ServerSocket(PIN);
-			chatRoomServerSockets.put(PIN, tempSS);
+			rf.port = PIN;
+			chatRoomServerSockets.put(rf, tempSS);
 		}
 		System.out.println("end makeChatRoom");
 		return PIN;
@@ -143,8 +147,9 @@ public class WaitingRoom extends Room {
 	private static boolean enterChatRoom(int PIN) {
 		if (chatRoomServerSockets.containsKey(PIN)) {
 			try {
-				new ChatRoom(chatRoomServerSockets.get(PIN).accept(),PIN,"user1","user@naver.com").start();
-				System.out.println("enterChatroom very good");
+				new ChatRoom(chatRoomServerSockets.get().accept(),PIN,"user1","user@naver.com").start();
+				new ChatRoom(chatRoomServerSockets.get)
+				System.out.println("Method enterChatroom successed");
 				return true;
 			} catch (Exception e) {
 				System.out.println("Error in enterChatroom");
