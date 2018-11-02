@@ -66,6 +66,7 @@ public class Client extends JFrame {
               btnEntrance.addActionListener(new ActionListener() {
                   public void actionPerformed(ActionEvent arg0) {
                  	//흐음......... 채팅방 들어가는 부분
+                	 // ???????
                   }
  				
                });
