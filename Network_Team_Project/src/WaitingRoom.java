@@ -36,7 +36,8 @@ public class WaitingRoom extends Room {
 			// 사용자가 waiting room에서 하는 일을 확인
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
-
+				
+				while(fromClient.available() > 0);
 				protocol = (Integer) fromClient.readObject();
 				System.out.println("protocol: " + protocol);
 				// protocol

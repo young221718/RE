@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
 
@@ -11,7 +10,7 @@ import basic.Room;
 
 public class ChatRoom extends Room{
 	
-	private static HashMap<Integer, PrintWriter> broadcaster = new HashMap<Integer, PrintWriter>();
+	private static HashMap<Integer, ObjectOutputStream> broadcaster = new HashMap<Integer, ObjectOutputStream>();
 	
 	public ChatRoom(Socket socket) {
 		super(socket);
@@ -38,21 +37,22 @@ public class ChatRoom extends Room{
 				toClient.writeObject(message);
 			}
 			
-//			synchronized (broadcaster) {
-//				broadcaster.put(portNumber, out);
-//			}
-//			
-//			while(true) {
-//				String input = in.readLine();
-//				if(input == null)
-//					return;
-//				
-//				for(PrintWriter writer: broadcaster.values()) {
-//					writer.println(input);
-//				}
-//			
-//				
-//			}
+			synchronized (broadcaster) {
+				broadcaster.put(portNumber, toClient);
+			}
+			
+			while(true) {
+				String input = (String)fromClient.readObject();
+				if(input == null)
+					return;
+				
+				for(ObjectOutputStream oos: broadcaster.values()) {
+					oos.writeObject(input);
+					oos.flush();
+				}
+			
+				
+			}
 		} catch (IOException e) {
 			System.out.println(e);
 			
