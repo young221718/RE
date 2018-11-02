@@ -15,26 +15,25 @@ public class Client {
 			ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
 			
 				
-			// 방만들기
+			// 채팅방만들기
 			Integer pro = new Integer(111);
 			out.writeObject(pro);
 			out.flush();
 			int roomNum = (Integer)in.readObject();
 			System.out.println("Room: "+ roomNum);
 			
-			// 방들어가기
+			// 채팅방들어가기
 			pro = new Integer(222);
 			out.writeObject(pro);
 			out.flush();
 			out.writeObject(roomNum);
 			
+			// 채팅방의 소켓, in, out 연결하기
 			Socket chatSocket = new Socket(host, roomNum);
-			System.out.println(3);
-			
 			ObjectOutputStream cout = new ObjectOutputStream(chatSocket.getOutputStream());
 			ObjectInputStream cin = new ObjectInputStream(chatSocket.getInputStream());
-			System.out.println(4);
-			
+
+			// 채팅방 test
 			for(int i=0;i<10;i++) {
 				cout.writeObject((Integer)i);
 				cout.flush();
