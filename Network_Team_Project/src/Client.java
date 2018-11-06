@@ -40,11 +40,11 @@ public class Client {
 				System.out.println((String)cin.readObject());
 			}
 			
-			
-			
+						
 			out.close();
 			in.close();
 			chatSocket.close();
+			
 			clientSocket.close();
 			
 		} catch (Exception e) {

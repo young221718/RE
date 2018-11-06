@@ -3,7 +3,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.io.File;
-import java.io.FileOutputStream;
+
 
 import basic.Room;
 
@@ -26,16 +26,29 @@ public class FileRoom extends Room{
          toClient = new ObjectOutputStream(roomSocket.getOutputStream());
          
          groupName = (String)fromClient.readObject();
-         File f = new File("C:\\Users\\", groupName);
-         FileOutputStream output = new FileOutputStream(f);
+         //File f = new File("C:\\Users\\", groupName);
+ 
+         String str = (String)fromClient.readObject();
+		System.out.println("sending file name: " + str);
+		File f = new File("C:\\Users\\À±ÇýÁÖ\\Downloads\\", str + ".jpg");
+			
+		byte[] buf = new byte[1024];
+		while(fromClient.read(buf)>0)
+		{
+			toClient.writeObject(buf);
+			toClient.flush();
+			
+		}
+			
+       /*  ObjectOutputStream fout = new ObjectOutputStream();
          
          byte[] buffer = new byte[1024];
          int bytesRead = 0;
          while ((bytesRead = fromClient.read(buffer))>=0) {
             toClient.write(buffer, 0, bytesRead);
-         }
-         toClient.flush();
-         System.out.println("file recieve success");
+            toClient.flush();
+         }*/
+         System.out.println(str + " file recieve success");
          
       } catch (IOException e) {
          e.printStackTrace();

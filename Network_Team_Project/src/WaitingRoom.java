@@ -38,6 +38,7 @@ public class WaitingRoom extends Room {
 			while (roomSocket.isConnected()) {
 
 				protocol = (Integer) fromClient.readObject();
+				
 				System.out.println("protocol: " + protocol);
 				// protocol
 				// 111 : 방을 만들고 싶다.
@@ -52,22 +53,31 @@ public class WaitingRoom extends Room {
 					try {
 						System.out.println("Enter protocol 111");
 						int roomNumber = makeChatRoom();
+						
 						toClient.writeObject(roomNumber);
+						
 						toClient.flush();
 						System.out.println(roomNumber + " room made");
-
+						
 					} catch (Exception e) {
 						// TODO : 오류 프로토콜 처리해야한다!!!!!!
 						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
+						toClient.writeBytes("ERROR: FAILED MAKING FileROOM");
 					}
 					System.out.println("End Protocol 111");
 
 				} else if (222 == protocol) { // Enter the room
 					System.out.println("Enter protocol 222");
-					int PIN = (Integer)fromClient.readObject();
-					System.out.println("Enter room Pin in " + PIN);
-					enterChatRoom(PIN);
+					int fileRoomNumber = makeFileRoom();
+					toClient.writeObject(fileRoomNumber);
+					System.out.println(fileRoomNumber + " file room made");
 
+					//int PIN = (Integer)fromClient.readObject();
+					int filePIN = (Integer)fromClient.readObject();
+					//System.out.println("Enter room Pin in " + PIN);
+					System.out.println("Enter File room Pin in " + fileRoomNumber);
+					//enterChatRoom(PIN);
+					enterFileRoom(fileRoomNumber);
 				} else {
 					// TODO : 프로토콜 예외 처리해야함.
 				}
@@ -167,7 +177,9 @@ public class WaitingRoom extends Room {
 	      System.out.println("Enter makeFileRoom");
 	      synchronized (fileRoomServerSockets) {
 
-	         PIN = makePIN()+1;
+	         PIN = makePIN();
+	         PIN++;
+	         
 	         if (fileRoomServerSockets.containsKey((Integer) PIN)) {
 	            System.out.println("eeeeeeaaaaak - file");
 	         }
