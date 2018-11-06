@@ -1,26 +1,24 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
 
 import basic.Room;
+import basic.RoomInformation;
 
 
 
 public class ChatRoom extends Room{
 	
-	private static HashMap<Integer, PrintWriter> broadcaster = new HashMap<Integer, PrintWriter>();
+	private static HashMap<Integer, ObjectOutputStream> broadcaster = new HashMap<Integer, ObjectOutputStream>();
 	
 	public ChatRoom(Socket socket) {
 		super(socket);
 	}
-	public ChatRoom(Socket socket, int port,String user, String email) {
+	public ChatRoom(Socket socket, RoomInformation rf) {
 		super(socket);
-		portNumber = port;
-		Name = user;
-		Email = email;
+		this.roomInfor = rf;
 		
 	}
 	
@@ -33,22 +31,25 @@ public class ChatRoom extends Room{
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			
 			for(int i=0;i<10;i++) {
-				int input = (Integer)fromClient.readObject();
-				String message = "from chatServer" + input;
+				String tstr = (String)fromClient.readObject();
+				System.out.println(tstr);
+				String message = "RE: " +tstr;
 				toClient.writeObject(message);
 			}
 			
 //			synchronized (broadcaster) {
-//				broadcaster.put(portNumber, out);
+//				broadcaster.put(portNumber, toClient);
 //			}
-//			
+//			for()
+//			System.out.println("ChatRoom Log 1");
 //			while(true) {
-//				String input = in.readLine();
+//				String input = (String)fromClient.readObject();
 //				if(input == null)
 //					return;
 //				
-//				for(PrintWriter writer: broadcaster.values()) {
-//					writer.println(input);
+//				for(ObjectOutputStream oos: broadcaster.values()) {
+//					oos.writeObject(input);
+//					oos.flush();
 //				}
 //			
 //				

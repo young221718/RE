@@ -1,21 +1,20 @@
 package MyPackage;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -26,7 +25,7 @@ public class Client extends JFrame {
 	
    LoginView loginView;
    HostView hostView;
-   BufferedReader in;
+   ObjectInputStream in;
     PrintWriter out;
  
     static Client frame = new Client();
@@ -41,7 +40,6 @@ public class Client extends JFrame {
          setBounds(100, 100, 940, 665);
         
         
-         
          contentPane = new JPanel();
          contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
               setContentPane(contentPane);
@@ -52,11 +50,11 @@ public class Client extends JFrame {
               egg.ta.setBounds(70, 20, 381, 434);
               contentPane.add(egg.ta);
               
-      		JTextArea textArea_1 = new JTextArea();
+      		JTextArea textArea_1 = new JTextArea(); //채팅내용 보여지는 부분
     		textArea_1.setBounds(39, 493, 475, 113);
     		contentPane.add(textArea_1);
     		/*contentPane.add(new JScrollPane(textArea_1));
-    		textArea_1.setEditable(false);*/
+    		textArea_1.setEditable(false);*/ //파일명 나열_스크롤 만드는 부분
     		
     		JButton btnSending = new JButton("Sending");  //파일 전송 버튼
     		btnSending.setBounds(218, 446, 106, 27);
@@ -65,6 +63,13 @@ public class Client extends JFrame {
       		  
               JButton btnEntrance = new JButton("ENTRANCE");//Pin번호가 맞으면-> 채팅방 입장
               btnEntrance.setBounds(558, 67, 106, 38);
+              btnEntrance.addActionListener(new ActionListener() {
+                  public void actionPerformed(ActionEvent arg0) {
+                 	//흐음......... 채팅방 들어가는 부분
+                	 // ???????
+                  }
+ 				
+               });
               contentPane.add(btnEntrance);
               
               txtPinNum = new JTextField();
@@ -80,6 +85,8 @@ public class Client extends JFrame {
                 	 getHostInfo();
                  }
               });
+              
+              
               contentPane.add(btnRoom);
               
               textField = new JTextField();
@@ -91,11 +98,12 @@ public class Client extends JFrame {
               textArea.setEditable(false);
               textArea.setBounds(558, 117, 350, 444);
               contentPane.add(textArea); //채팅이 보여지는 부분
-          	//contentPane.add(new JScrollPane(textArea_1));
-            //textArea.setEditable(false);
               
-              /*JScrollPane scrollPane1 = new JScrollPane(textArea);
-              contentPane.add(scrollPane1);*/
+          	/*ontentPane.add(new JScrollPane(textArea_1));
+              textArea.setEditable(false); 
+              
+              JScrollPane scrollPane1 = new JScrollPane(textArea);
+              contentPane.add(scrollPane1);*/ //스크롤 만드는 부분 -> 자동 스크롤
               
               textField.addActionListener(new ActionListener() { /*문장 입력하는 부분*/
                   public void actionPerformed(ActionEvent e) {
@@ -160,14 +168,40 @@ public class Client extends JFrame {
       //서버와의 통신담당
       
       
-      
-      String serverAddress = getServerAddress();
+
+	    String serverAddress = getServerAddress(); //서버의 주소 담을 변수
+        Socket socket = new Socket(serverAddress, 9001); //소켓생성과 서버의 IP받기
+        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());  
+     
+        /*while (true) {
+            String line = in.readLine(); 
+            if (line.startsWith("SUBMITNAME")) {  //SUBMITNAME이름을 입력받았을때 
+            	out.println(getName());
+            } else if(line.startsWith("Entry")){  //사람이 입장하면 입장을 알리는 부분
+           	 textArea_1.append(line.substring(5) + "\n");
+            } else if (line.startsWith("NAMEACCEPTED")) {  
+                textField.setEditable(true);
+            } else if (line.startsWith("MESSAGE")) {  //사람들의 MESSAGE를 모두에게 출력하라는 명령을 받는 부분
+           	 textArea_1.append(line.substring(8) + "\n");
+            } else if(line.startsWith("Exit")){  //사람이 퇴장하면 퇴장을 알리는 부분
+           	 textArea_1.append(line.substring(4) + "\n");
+            }
+        }*/
+        
       getUserInfo();
-        Socket socket = new Socket(serverAddress, 9001);
-        in = new BufferedReader(new InputStreamReader(
-            socket.getInputStream()));
-        out = new PrintWriter(socket.getOutputStream(), true);
-   
+      
+      
+         
+      
+      
+      
+      
+      
+        
+        
+        
+        
       //이 밑으로는 프로토콜 코드 필요
       
       
