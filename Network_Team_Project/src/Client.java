@@ -48,19 +48,11 @@ public class Client {
 			//==================================================================
 			System.out.println("Chatting is dead");
 			
-<<<<<<< HEAD
-						
-			out.close();
-			in.close();
-			chatSocket.close();
-			
-=======
 			// 종료하기 ==========================================================
 			out.writeInt(888); // protocol bye-bye-bye
 			// 스트림과 소켓 닫기
 			out.close();
 			in.close();
->>>>>>> 2a3bcd334e9e1ac8d60c55dfd45db95d0583fc34
 			clientSocket.close();
 			// ================================================================
 		

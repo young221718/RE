@@ -35,12 +35,8 @@ public class WaitingRoom extends Room {
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
 
-<<<<<<< HEAD
-				protocol = (Integer) fromClient.readObject();
-				
-=======
+
 				protocol = (Integer) fromClient.readInt();
->>>>>>> 2a3bcd334e9e1ac8d60c55dfd45db95d0583fc34
 				System.out.println("protocol: " + protocol);
 				// protocol
 				// 111 : 방을 만들고 싶다.
@@ -61,18 +57,13 @@ public class WaitingRoom extends Room {
 						
 						toClient.flush();
 						System.out.println(roomNumber + " room made");
-<<<<<<< HEAD
+
 						
 					} catch (Exception e) {
 						// TODO : 오류 프로토콜 처리해야한다!!!!!!
 						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
 						toClient.writeBytes("ERROR: FAILED MAKING FileROOM");
-=======
-					} catch (Exception e) {
-						// TODO : 오류 프로토콜 처리해야한다!!!!!!
-						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
 						e.printStackTrace();
->>>>>>> 2a3bcd334e9e1ac8d60c55dfd45db95d0583fc34
 					}
 					System.out.println("End Protocol 111");
 
@@ -241,61 +232,62 @@ public class WaitingRoom extends Room {
 		return false;
 	}
 
-<<<<<<< HEAD
-	   // 파일룸
-	   /**
-	    * makeFileRoom
-	    * 
-	    * 이 함수는 사용자가 방 만들기 버튼을 누르고, 올바른 옵션을 입력한 후 채팅방의 서버소켓을 할당하는 함수 이다. 유니크한 핀번호를 가지게
-	    * 될때 까지 핀 번호를 할당을 시도한다.
-	    * 
-	    * @return : 파일룸의 PIN 번호를 리턴해준다. (채팅방의 PIN 번호는 짝수이다.)
-	    */
-	   private int makeFileRoom() throws Exception {
-	      int PIN;
-	      System.out.println("Enter makeFileRoom");
-	      synchronized (fileRoomServerSockets) {
+	<<<<<<<HEAD
 
-	         PIN = makePIN();
-	         PIN++;
-	         
-	         if (fileRoomServerSockets.containsKey((Integer) PIN)) {
-	            System.out.println("eeeeeeaaaaak - file");
-	         }
-	         ServerSocket tempSV = new ServerSocket(PIN);
+	// 파일룸
+	/**
+	 * makeFileRoom
+	 * 
+	 * 이 함수는 사용자가 방 만들기 버튼을 누르고, 올바른 옵션을 입력한 후 채팅방의 서버소켓을 할당하는 함수 이다. 유니크한 핀번호를 가지게
+	 * 될때 까지 핀 번호를 할당을 시도한다.
+	 * 
+	 * @return : 파일룸의 PIN 번호를 리턴해준다. (채팅방의 PIN 번호는 짝수이다.)
+	 */
+	private int makeFileRoom() throws Exception {
+		int PIN;
+		System.out.println("Enter makeFileRoom");
+		synchronized (fileRoomServerSockets) {
 
-	         fileRoomServerSockets.put(PIN, tempSV);
-	      }
-	      System.out.println("end makeFileRoom");
-	      return PIN;
-	   }
+			PIN = makePIN();
+			PIN++;
 
-	   /**
-	    * enterFileRoom
-	    * 
-	    * 이 함수는 사용자가 PIN 번호를 입력하고 방에 들었가기를 눌렀을 때 사용될 함수이다. 사용자가 올바른 PIN 번호를 입력했을 때만 방으로
-	    * 연결해 준다.
-	    * 
-	    * @param PIN
-	    *            - 들어가고 싶은 채팅방의 핀번호
-	    * @return 오류 없이 방에 들어갔으면 true를 리턴해준다.
-	    */
-	   private static boolean enterFileRoom(int PIN) {
-	      if (fileRoomServerSockets.containsKey(PIN)) {
-	         try {
-	            new ChatRoom(fileRoomServerSockets.get(PIN).accept()).start();
-	            System.out.println("enterFileroom very good");
-	            return true;
-	         } catch (Exception e) {
-	            System.out.println("Error in enterFileroom");
-	         }
-	      }
-	      System.out.println("FFFFFFFFFF - file");
-	      return false;
-	   }
-	   
-=======
->>>>>>> 2a3bcd334e9e1ac8d60c55dfd45db95d0583fc34
+			if (fileRoomServerSockets.containsKey((Integer) PIN)) {
+				System.out.println("eeeeeeaaaaak - file");
+			}
+			ServerSocket tempSV = new ServerSocket(PIN);
+
+			fileRoomServerSockets.put(PIN, tempSV);
+		}
+		System.out.println("end makeFileRoom");
+		return PIN;
+	}
+
+	/**
+	 * enterFileRoom
+	 * 
+	 * 이 함수는 사용자가 PIN 번호를 입력하고 방에 들었가기를 눌렀을 때 사용될 함수이다. 사용자가 올바른 PIN 번호를 입력했을 때만 방으로
+	 * 연결해 준다.
+	 * 
+	 * @param PIN
+	 *            - 들어가고 싶은 채팅방의 핀번호
+	 * @return 오류 없이 방에 들어갔으면 true를 리턴해준다.
+	 */
+	private static boolean enterFileRoom(int PIN) {
+		if (fileRoomServerSockets.containsKey(PIN)) {
+			try {
+				new ChatRoom(fileRoomServerSockets.get(PIN).accept()).start();
+				System.out.println("enterFileroom very good");
+				return true;
+			} catch (Exception e) {
+				System.out.println("Error in enterFileroom");
+			}
+		}
+		System.out.println("FFFFFFFFFF - file");
+		return false;
+	}
+
+	=======>>>>>>>2 a3bcd334e9e1ac8d60c55dfd45db95d0583fc34
+
 	/**
 	 * makePIN
 	 * 
