@@ -1,3 +1,6 @@
+/ChatClientTest$Chatting.class
+/ChatClientTest$Transmission.class
+/ChatClientTest.class
 /ChatRoom.class
 /Client$Chatting.class
 /Client$Transmission.class
@@ -9,11 +12,3 @@
 /basic/
 /fileClient$Transmission.class
 /fileClient.class
-<<<<<<< HEAD
-/Client$Transmission.class
->>>>>>> 13d9e8b545f85de7ed34742fe028d15003fe6c4f
-/ChatClientTest$Chatting.class
-/ChatClientTest$Transmission.class
-/ChatClientTest.class
-=======
->>>>>>> ac6ac6aa8c6a7a8c72377b8fd2fbd462e4bfbc8c

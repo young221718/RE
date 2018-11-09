@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Calendar;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -23,14 +24,18 @@ import javax.swing.border.EmptyBorder;
 
 public class Client extends JFrame {
 	
+	protected static final String pinNumber = null;
+	ObjectInputStream in;
+    ObjectOutputStream out;
+	
+    PrintWriter OUT;
    LoginView loginView;
    HostView hostView;
-   ObjectInputStream in;
-    PrintWriter out;
     RoomInformation info;
  
     static Client frame = new Client();
     	
+    protected Object txtrPn;
        JPanel contentPane;
        JTextField txtPinNum;
        JTextField textField;
@@ -44,10 +49,10 @@ public class Client extends JFrame {
         
          contentPane = new JPanel();
          contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-              setContentPane(contentPane);
-              contentPane.setLayout(null);
+         setContentPane(contentPane);
+         contentPane.setLayout(null);
               
-              DragNDrop egg = new DragNDrop();
+         DragNDrop egg = new DragNDrop();
               egg.ta.setIcon(new ImageIcon("R.PNG"));
               egg.ta.setBounds(70, 20, 381, 434);
               contentPane.add(egg.ta);
@@ -109,7 +114,7 @@ public class Client extends JFrame {
               
               textField.addActionListener(new ActionListener() { /*문장 입력하는 부분*/
                   public void actionPerformed(ActionEvent e) {
-                      out.println(textField.getText());
+                      OUT.println(textField.getText());
                       textField.setText("");
                   }
               });
@@ -163,7 +168,22 @@ public class Client extends JFrame {
         	  info.securityQuestion = hostView.secQText.getText();
         	  info.securityAnswer = hostView.secAText.getText();
         	  info.howManyPeople = hostView.joinNum.getSelectedIndex()+1;
-        	  //System.out.println(info.groupName + info.securityQuestion + info.howManyPeople);
+        	  //info.endDate.set(Integer.parseInt(hostView.yearText.getText()),Integer.parseInt(hostView.monthText.getText()),Integer.parseInt(hostView.dateText.getText()));
+        	  //Calendar cal= Calendar.getInstance();
+        	  
+        	  try {
+                  out.writeInt(111);
+                  out.flush();
+                  out.writeObject(info);
+                  out.flush();
+                  
+                  Object pinNumber = in.readObject(); //
+                  //Client.Client().txtrPn.setText(pinNumber);
+                  
+            } catch (IOException | ClassNotFoundException e1) {
+               e1.printStackTrace();
+            } 
+        	  disposeHost();
         	  
         	  
         	  
@@ -210,7 +230,7 @@ public class Client extends JFrame {
       getUserInfo();
       
       
-         
+      
       
       
       //이 밑으로는 프로토콜 코드 필요
