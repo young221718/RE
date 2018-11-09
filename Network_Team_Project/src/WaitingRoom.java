@@ -12,6 +12,7 @@ import basic.RoomInformation;
 public class WaitingRoom extends Room {
 
 	public static HashMap<Integer, ServerSocket> chatRoomServerSockets = new HashMap<Integer, ServerSocket>();
+	public static HashMap<Integer, RoomInformation> roomInforMap = new HashMap<Integer, RoomInformation>();
 	public static HashMap<Integer, ServerSocket> fileRoomServerSockets = new HashMap<Integer, ServerSocket>();
 
 	private static Integer ROOMPIN = new Integer(10000);
@@ -35,7 +36,6 @@ public class WaitingRoom extends Room {
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
 
-
 				protocol = (Integer) fromClient.readInt();
 				System.out.println("protocol: " + protocol);
 				// protocol
@@ -52,14 +52,12 @@ public class WaitingRoom extends Room {
 					try {
 						System.out.println("Enter protocol 111");
 						int roomNumber = makeChatRoom();
-						makeFileRoom(roomNumber+1);
-						
+						makeFileRoom(roomNumber + 1);
+
 						toClient.writeObject(roomNumber);
-						
 						toClient.flush();
 						System.out.println(roomNumber + " room made");
 
-						
 					} catch (Exception e) {
 						// TODO : 오류 프로토콜 처리해야한다!!!!!!
 						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
@@ -74,7 +72,7 @@ public class WaitingRoom extends Room {
 					int PIN = (Integer) fromClient.readObject();
 					System.out.println("Enter room Pin in " + PIN);
 					enterChatRoom(PIN);
-					enterFileRoom(PIN+1);
+					enterFileRoom(PIN + 1);
 
 				} else if (888 == protocol) {
 					toClient.close();
@@ -139,6 +137,9 @@ public class WaitingRoom extends Room {
 			if (chatRoomServerSockets.containsKey((Integer) PIN)) {
 				System.out.println("Already Exist - ChatRoom:" + PIN);
 			}
+			synchronized (roomInforMap) {
+				roomInforMap.put((Integer)PIN, roomInfor);
+			}
 			ServerSocket tempSS = new ServerSocket(PIN);
 			roomInfor.port = PIN;
 			chatRoomServerSockets.put(PIN, tempSS);
@@ -160,7 +161,7 @@ public class WaitingRoom extends Room {
 	private static boolean enterChatRoom(int PIN) {
 		if (chatRoomServerSockets.containsKey(PIN)) {
 			try {
-				new ChatRoom(chatRoomServerSockets.get(PIN).accept()).start();
+				new ChatRoom(chatRoomServerSockets.get(PIN).accept(),roomInforMap.get(PIN)).start();
 
 				System.out.println("Method enterChatroom successed");
 				return true;
@@ -172,7 +173,6 @@ public class WaitingRoom extends Room {
 	}
 	// End ChatRoom
 	// Method=======================================================================================
-
 
 	// 파일룸
 	/**
@@ -210,7 +210,7 @@ public class WaitingRoom extends Room {
 	private static boolean enterFileRoom(int PIN) {
 		if (fileRoomServerSockets.containsKey(PIN)) {
 			try {
-				new FileRoom(fileRoomServerSockets.get(PIN).accept()).start();
+				new FileRoom(fileRoomServerSockets.get(PIN).accept(),roomInforMap.get(PIN-1)).start();
 				System.out.println("enterFileroom very good");
 				return true;
 			} catch (Exception e) {
@@ -220,7 +220,6 @@ public class WaitingRoom extends Room {
 		System.out.println("FFFFFFFFFF - file");
 		return false;
 	}
-
 
 	/**
 	 * makePIN

@@ -19,6 +19,7 @@ public class ChatRoom extends Room{
 	public ChatRoom(Socket socket, RoomInformation rf) {
 		super(socket);
 		this.roomInfor = rf;
+		this.portNumber = this.roomInfor.port;
 		
 	}
 	
@@ -30,30 +31,29 @@ public class ChatRoom extends Room{
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			
-			for(int i=0;i<10;i++) {
-				String tstr = (String)fromClient.readObject();
-				System.out.println(tstr);
-				String message = "RE: " +tstr;
-				toClient.writeObject(message);
-			}
+//			for(int i=0;i<10;i++) {
+//				String tstr = (String)fromClient.readObject();
+//				System.out.println(tstr);
+//				String message = "RE: " +tstr;
+//				toClient.writeObject(message);
+//			}
 			
-//			synchronized (broadcaster) {
-//				broadcaster.put(portNumber, toClient);
-//			}
-//			for()
-//			System.out.println("ChatRoom Log 1");
-//			while(true) {
-//				String input = (String)fromClient.readObject();
-//				if(input == null)
-//					return;
-//				
-//				for(ObjectOutputStream oos: broadcaster.values()) {
-//					oos.writeObject(input);
-//					oos.flush();
-//				}
-//			
-//				
-//			}
+			synchronized (broadcaster) {
+				broadcaster.put(portNumber, toClient);
+			}
+			System.out.println("ChatRoom Log 1");
+			while(true) {
+				String input = (String)fromClient.readObject();
+				if(input == null)
+					return;
+				
+				for(ObjectOutputStream oos: broadcaster.values()) {
+					oos.writeObject(input);
+					oos.flush();
+				}
+			
+				
+			}
 		} catch (IOException e) {
 			System.out.println(e);
 			
