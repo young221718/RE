@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,7 +20,7 @@ public class Client {
 			ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
 			ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
 
-			// 채팅방 만들기 =======================================================
+			// 채팅&파일 만들기 =======================================================
 			out.writeInt(111);// 채팅방을 만들기 위한 프로토콜 111
 			out.flush();
 			// 방 정보 보내기
@@ -30,7 +32,7 @@ public class Client {
 			System.out.println("Room: " + roomNum);
 			// ================================================================
 
-			// 채팅방 들어가기 =======================================================
+			// 채팅&파일 방 들어가기 =======================================================
 			out.writeInt(222);// 채팅방에 들어가기 위한 프로토콜 222
 			out.flush();
 			// 입력한 핀번호 혹은 서버에게로 받은 핀번호를 서버한테 보낸다.
@@ -41,26 +43,20 @@ public class Client {
 			// 채팅을 시작함========================================================
 			Chatting ch = new Chatting(roomNum);
 			ch.start(); // 채팅 쓰레드를 시작
-			while(ch.isAlive()) {
+			Transmission tr = new Transmission(roomNum);
+			tr.start();
+			while(ch.isAlive() || tr.isAlive()) {
 				// 채팅방이 살아있을 때까지 아무것도 안함
 				// TODO: 수정이 필요함
 			}
 			//==================================================================
-			System.out.println("Chatting is dead");
+			System.out.println("Chatting & FILE is dead");
 			
-<<<<<<< HEAD
-						
-			out.close();
-			in.close();
-			chatSocket.close();
-			
-=======
 			// 종료하기 ==========================================================
 			out.writeInt(888); // protocol bye-bye-bye
 			// 스트림과 소켓 닫기
 			out.close();
 			in.close();
->>>>>>> 2a3bcd334e9e1ac8d60c55dfd45db95d0583fc34
 			clientSocket.close();
 			// ================================================================
 		
@@ -124,4 +120,68 @@ public class Client {
 		}
 	}
 	// ===============================================================================
+	
+	
+	private static class Transmission extends Thread {
+		  // Socket fileSocket = new Socket(host, roomNum);
+	       //ObjectOutputStream fout = new ObjectOutputStream(fileSocket.getOutputStream());
+	       //ObjectInputStream fin = new ObjectInputStream(fileSocket.getInputStream());
+	       
+		   Socket fileSocket;
+		   ObjectInputStream fin;
+		   ObjectOutputStream fout;
+		   
+	       public Transmission(int rm) {
+	    	   try {
+					InetAddress host = InetAddress.getLocalHost(); // 로컬 주소 받아오기
+					this.fileSocket = new Socket(host, rm+1);
+					this.fout = new ObjectOutputStream(fileSocket.getOutputStream());
+					this.fin = new ObjectInputStream(fileSocket.getInputStream());
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+	       }
+	       public void run() {
+	    	   try {
+	    	// 파일룸 test
+	           int i=0;
+	           fout.writeObject((Integer)i);
+	           fout.flush();
+	           
+	           //String groupN = (String)fin.readObject(); // 그룹명
+	           //String str = (String)in.readObject();
+	           String imageName = "익스샌프란01";
+	           fout.writeObject((String)imageName);
+	           System.out.println("file name: " + imageName);
+	           File f = new File("C:\\Users\\윤혜주\\Downloads\\2018-2학기\\프잉", imageName + ".jpg");
+	           //FileInputStream fileIn = new FileInputStream(f);
+	          FileOutputStream fos = new FileOutputStream(f);
+	          // ObjectInputStream ois = new ObjectInputStream(fileSocket.getInputStream());
+	           byte[] buf = new byte[1024];
+	           int n =0;
+	    	   int cnt = 0;
+	    	   long fileSize = 0;
+	          // while(fin.read(buf, 0, 1024) ) {
+	           while ((n = fin.read(buf)) != -1) {
+	        	  fileSize += n;
+	              fout.write(buf);
+	              fout.flush();
+	              cnt++;
+	           }
+	              this.fout.close();               
+	    	   } catch (Exception e) {
+	    		   e.printStackTrace();
+	    	   } finally {
+	    		   try {
+	    			   fileSocket.close();
+	    			   this.fin.close();
+	    			   this.fout.close();
+	    		   } catch (Exception e) {
+	    			   e.printStackTrace();
+	    		   }
+	    	   }
+	       }
+	   }
 }

@@ -3,20 +3,20 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.io.File;
-
+import java.io.FileInputStream;
 
 import basic.Room;
+import basic.RoomInformation;
 
 public class FileRoom extends Room{
 
    public FileRoom(Socket socket) {
       super(socket);
    }
-   public FileRoom(Socket socket, int port, String group_name)
+   public FileRoom(Socket socket, RoomInformation rf)
    {
       super(socket);
-      portNumber = port; 
-      groupName = group_name;   
+      this.roomInfor = rf;
    }
    
    public void run() {
@@ -29,17 +29,18 @@ public class FileRoom extends Room{
          //File f = new File("C:\\Users\\", groupName);
  
          String str = (String)fromClient.readObject();
-		System.out.println("sending file name: " + str);
-		File f = new File("C:\\Users\\À±ÇýÁÖ\\Downloads\\", str + ".jpg");
-			
-		byte[] buf = new byte[1024];
-		while(fromClient.read(buf)>0)
-		{
-			toClient.writeObject(buf);
-			toClient.flush();
-			
-		}
-			
+      System.out.println("sending file name: " + str);
+      File f = new File("C:\\Users\\À±ÇýÁÖ\\Downloads\\", str + ".jpg");
+      FileInputStream fis = new FileInputStream(f);
+      
+      byte[] buf = new byte[1024];
+      while(fromClient.read(buf)>0)
+      {
+         toClient.writeObject(buf);
+         toClient.flush();
+         
+      }
+         
        /*  ObjectOutputStream fout = new ObjectOutputStream();
          
          byte[] buffer = new byte[1024];
