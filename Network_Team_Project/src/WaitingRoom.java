@@ -10,7 +10,8 @@ import basic.Room;
 import basic.RoomInformation;
 
 public class WaitingRoom extends Room {
-
+	
+	
 	public static HashMap<Integer, ServerSocket> chatRoomServerSockets = new HashMap<Integer, ServerSocket>();
 	public static HashMap<Integer, RoomInformation> roomInforMap = new HashMap<Integer, RoomInformation>();
 	public static HashMap<Integer, ServerSocket> fileRoomServerSockets = new HashMap<Integer, ServerSocket>();
@@ -114,7 +115,7 @@ public class WaitingRoom extends Room {
 	 * @return : 로그인이 성공적으로 되었으면 true를 리턴, 다른 오류가 있을 경우 false 를 리턴한다.
 	 */
 	private boolean logIn() {
-
+		
 		return true;
 
 	}

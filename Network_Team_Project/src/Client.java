@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -136,7 +137,7 @@ public class Client {
 					InetAddress host = InetAddress.getLocalHost(); // ·ÎÄÃ ÁÖ¼Ò ¹Þ¾Æ¿À±â
 					this.fileSocket = new Socket(host, rm+1);
 					this.fout = new ObjectOutputStream(fileSocket.getOutputStream());
-					this.fin = new ObjectInputStream(fileSocket.getInputStream());
+					//this.fin = new ObjectInputStream(fileSocket.getInputStream());
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (Exception e) {
@@ -145,43 +146,35 @@ public class Client {
 	       }
 	       public void run() {
 	    	   try {
-	    	// ÆÄÀÏ·ë test
-	           int i=0;
-	           fout.writeObject((Integer)i);
-	           fout.flush();
-	           
+	    	
 	           //String groupN = (String)fin.readObject(); // ±×·ì¸í
 	           //String str = (String)in.readObject();
 	           String imageName = "ÀÍ½º»÷ÇÁ¶õ01";
-	           fout.writeObject((String)imageName);
+	           fout.writeObject(imageName);
 	           System.out.println("file name: " + imageName);
-	           File f = new File("C:\\Users\\À±ÇýÁÖ\\Downloads\\2018-2ÇÐ±â\\ÇÁÀ×", imageName + ".jpg");
-	           //FileInputStream fileIn = new FileInputStream(f);
-	          FileOutputStream fos = new FileOutputStream(f);
-	          // ObjectInputStream ois = new ObjectInputStream(fileSocket.getInputStream());
-	           byte[] buf = new byte[1024];
-	           int n =0;
-	    	   int cnt = 0;
-	    	   long fileSize = 0;
-	          // while(fin.read(buf, 0, 1024) ) {
-	           while ((n = fin.read(buf)) != -1) {
-	        	  fileSize += n;
-	              fout.write(buf);
-	              fout.flush();
-	              cnt++;
-	           }
-	              this.fout.close();               
+	          
+	           InputStream in = fileSocket.getInputStream();
+	           FileOutputStream out = new FileOutputStream("C:\\Users\\À±ÇýÁÖ\\Downloads\\us1_test.png"); 
+
+	            byte[] buffer = new byte[8192];
+	            int bytesRead=0;
+	            while ((bytesRead = in.read(buffer)) > 0) {
+	                out.write(buffer, 0, bytesRead);
+	            }
+	            out.flush();
+	            out.close();
 	    	   } catch (Exception e) {
 	    		   e.printStackTrace();
 	    	   } finally {
 	    		   try {
 	    			   fileSocket.close();
-	    			   this.fin.close();
-	    			   this.fout.close();
+	    			   //fin.close();
+	    			  
+	    			   fout.close();
 	    		   } catch (Exception e) {
 	    			   e.printStackTrace();
 	    		   }
 	    	   }
 	       }
-	   }
+	}
 }
