@@ -24,18 +24,19 @@ import javax.swing.border.EmptyBorder;
 
 public class Client extends JFrame {
 	
-	protected static final String pinNumber = null;
+	//protected static final String pinNumber = null;
 	ObjectInputStream in;
     ObjectOutputStream out;
+    Socket socket;
 	
-    PrintWriter OUT;
-   LoginView loginView;
-   HostView hostView;
+    PrintWriter OUT; //유저가 문장을 입력하는 부분에 사용됨
+    LoginView loginView;
+    HostView hostView;
     RoomInformation info;
  
     static Client frame = new Client();
-    	
-    protected Object txtrPn;
+   // protected Object txtrPn;
+    
        JPanel contentPane;
        JTextField txtPinNum;
        JTextField textField;
@@ -73,7 +74,7 @@ public class Client extends JFrame {
               btnEntrance.addActionListener(new ActionListener() {
                   public void actionPerformed(ActionEvent arg0) {
                  	//흐음......... 채팅방 들어가는 부분
-                	 // ???????
+                	// ???????
                   }
  				
                });
@@ -89,7 +90,8 @@ public class Client extends JFrame {
               btnRoom.setBounds(558, 20, 79, 40);
               btnRoom.addActionListener(new ActionListener() {
                  public void actionPerformed(ActionEvent arg0) {
-                	 getHostInfo();
+                	 getHostInfo();  //방 만들기_팝업창
+                	 
                  }
               });
               
@@ -101,16 +103,16 @@ public class Client extends JFrame {
               contentPane.add(textField);
               textField.setColumns(10);
               
-              JTextArea textArea = new JTextArea();
+              JTextArea textArea = new JTextArea();  //채팅이 보여지는 부분
               textArea.setEditable(false);
               textArea.setBounds(558, 117, 350, 444);
-              contentPane.add(textArea); //채팅이 보여지는 부분
+              contentPane.add(textArea); 
               
           	/*ontentPane.add(new JScrollPane(textArea_1));
               textArea.setEditable(false); 
               
               JScrollPane scrollPane1 = new JScrollPane(textArea);
-              contentPane.add(scrollPane1);*/ //스크롤 만드는 부분 -> 자동 스크롤
+              contentPane.add(scrollPane1);*/ //스크롤 만드는 부분 -> 마지막에 자동 스크롤로  바꾸기
               
               textField.addActionListener(new ActionListener() { /*문장 입력하는 부분*/
                   public void actionPerformed(ActionEvent e) {
@@ -122,7 +124,7 @@ public class Client extends JFrame {
               
               JTextArea txtrPn = new JTextArea();
               txtrPn.setEditable(false);
-              txtrPn.setText("Showing Pin Number");
+             // txtrPn.setText("Showing Pin Number");
               txtrPn.setBounds(645, 20, 263, 38);
               contentPane.add(txtrPn);
            }
@@ -145,7 +147,6 @@ public class Client extends JFrame {
        Client main = new Client();
         main.loginView = new LoginView(); // 로그인창 보이기
         main.loginView.setMain(main);
-
     }
     
     public void disposeLogin(){
@@ -172,28 +173,30 @@ public class Client extends JFrame {
         	  //Calendar cal= Calendar.getInstance();
         	  
         	  try {
-                  out.writeInt(111);
-                  out.flush();
+
                   out.writeObject(info);
                   out.flush();
                   
-                  Object pinNumber = in.readObject(); //
-                  //Client.Client().txtrPn.setText(pinNumber);
+                  Object pinNumber = in.readObject(); 
+                 // Client.Client().txtrPn.setText(pinNumber);
                   
             } catch (IOException | ClassNotFoundException e1) {
                e1.printStackTrace();
             } 
         	  disposeHost();
-        	  
-        	  
-        	  
-        	  
+  
            }
        });
        
        
     }
-    public void disposeHost() {
+   /* protected static Object Client() {
+		
+		return null;
+	}*/
+
+
+	public void disposeHost() {
        hostView.dispose();
     }
     
@@ -208,9 +211,9 @@ public class Client extends JFrame {
       
 
 	    String serverAddress = getServerAddress(); //서버의 주소 담을 변수
-        Socket socket = new Socket(serverAddress, 9001); //소켓생성과 서버의 IP받기
-        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());  
+        socket = new Socket(serverAddress, 1234); //소켓생성과 서버의 IP받기
+        in = new ObjectInputStream(socket.getInputStream());
+        out = new ObjectOutputStream(socket.getOutputStream());  
      
         /*while (true) {
             String line = in.readLine(); 
@@ -230,21 +233,16 @@ public class Client extends JFrame {
       getUserInfo();
       
       
-      
-      
-      
       //이 밑으로는 프로토콜 코드 필요
-      
-      
    }
    
    public static void main(String[] args) throws Exception {
-		frame.setVisible(true);
+	  frame.setVisible(true);
       
       Client R_E = new Client();
       R_E.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        R_E.frame.setVisible(true);
-        R_E.run();
+      R_E.frame.setVisible(true);
+      R_E.run();
 
       
    }
