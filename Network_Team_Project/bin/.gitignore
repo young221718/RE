@@ -1,2 +1,16 @@
+<<<<<<< HEAD
 /Client$Chatting.class
 /basic/
+=======
+/ChatRoom.class
+/Client$Chatting.class
+/Client.class
+/FileRoom.class
+/MyPackage/
+/ReServer.class
+/WaitingRoom.class
+/basic/
+/fileClient$Transmission.class
+/fileClient.class
+/Client$Transmission.class
+>>>>>>> 13d9e8b545f85de7ed34742fe028d15003fe6c4f
