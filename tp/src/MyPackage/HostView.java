@@ -20,10 +20,12 @@ import javax.swing.ComboBoxEditor;
 public class HostView extends JFrame {
 
    private Client main;
+   private RoomInformation info;
       
-    private JButton btnConfirm;
+    public JButton btnConfirm;
     private JButton btnInit;
-    private JTextField userText,numJoinText,secQText,secAText,dateText;
+    public JTextField userText,numJoinText,secQText,secAText,dateText;
+    public JComboBox joinNum;
    
     public static void main(String[] args) {
         //new LoginView();
@@ -85,7 +87,7 @@ public class HostView extends JFrame {
         panel.add(numJoinText);*/
         
         String[] number={"1", "2", "3", "4","5"};
-        JComboBox joinNum = new JComboBox(number);
+        joinNum = new JComboBox(number);
         joinNum.setBounds(200,40,160,25);
         panel.add(joinNum);
         
@@ -125,24 +127,7 @@ public class HostView extends JFrame {
         btnConfirm = new JButton("Confirm");
         btnConfirm.setBounds(230, 175, 100, 25);
         panel.add(btnConfirm);
-        btnConfirm.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               //confirm 눌렀을때 액션 들어가는 부분, 이 버튼의 액션리스너를 통해 인풋값이 전송될 예정
-               //각각의 텍스트 Area에 입력된 값을 받아올경우엔 .getText() 등을 사용한다.(ex secQText.getText)
-               // combo박스 (인원수)를 받아올때는 joinNum.getSelectedItem() 이 사용
                
-            	btnConfirm.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						
-						
-					}
-            	});
-               
-               main.disposeHost();// 현재 confirm 눌렀을때 창 사라지는 disposeHost가 등록되어있다. 이위에다 전송하는 코드 넣어야함
-
-            }
-        });
     }
    
  
@@ -150,6 +135,9 @@ public class HostView extends JFrame {
     // mainProcess와 연동
     public void setMain(Client main) {
         this.main = main;
+    }
+    public void setInfo(RoomInformation info) {
+    	this.info = info;
     }
    
 }

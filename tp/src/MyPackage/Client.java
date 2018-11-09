@@ -27,15 +27,17 @@ public class Client extends JFrame {
    HostView hostView;
    ObjectInputStream in;
     PrintWriter out;
+    RoomInformation info;
  
     static Client frame = new Client();
-    
+    	
        JPanel contentPane;
        JTextField txtPinNum;
        JTextField textField;
 
         
    public Client(){
+	   	info = new RoomInformation();
          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
          setBounds(100, 100, 940, 665);
         
@@ -149,9 +151,21 @@ public class Client extends JFrame {
     
     //호스트 버튼 눌렀을 시 실행될 메소드
     private void getHostInfo() {
-       Client main = new Client();
-       main.hostView = new HostView();
-       main.hostView.setMain(main);
+       frame.hostView = new HostView();
+       frame.hostView.setMain(frame);
+       frame.hostView.setInfo(info);
+       hostView.btnConfirm.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+              //confirm 눌렀을때 액션 들어가는 부분, 이 버튼의 액션리스너를 통해 인풋값이 전송되고 소켓이 연결될예정
+              //각각의 텍스트 Area에 입력된 값을 받아올경우엔 .getText() 등을 사용한다.(ex userText.getText()  )
+              info.groupName = hostView.userText.getText();
+        	  info.securityQuestion = hostView.secQText.getText();
+        	  info.securityAnswer = hostView.secAText.getText();
+        	  info.howManyPeople = hostView.joinNum.getSelectedIndex()+1;
+        	  System.out.println(info.groupName + info.securityQuestion + info.howManyPeople);
+           }
+       });
        
        
     }
