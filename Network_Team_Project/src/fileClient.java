@@ -37,6 +37,35 @@ public class fileClient {
          // ½ºÆ®¸²°ú ¼ÒÄÏ ´Ý±â
          out.close();
          in.close();
+         
+         // ÆÄÀÏ·ëÀÇ ¼ÒÄÏ, in, out ¿¬°áÇÏ±â
+         /*Socket fileSocket = new Socket(host, roomNum);
+         ObjectOutputStream fout = new ObjectOutputStream(fileSocket.getOutputStream());
+         ObjectInputStream fin = new ObjectInputStream(fileSocket.getInputStream());
+         
+         // ÆÄÀÏ·ë test
+         int i=0;
+         fout.writeObject((Integer)i);
+         fout.flush();
+         
+         //String groupN = (String)fin.readObject(); // ±×·ì¸í
+         //String str = (String)in.readObject();
+         String imageName = "ÀÍ½º»÷ÇÁ¶õ01";
+         fout.writeObject((String)imageName);
+         System.out.println("file name: " + imageName);
+         File f = new File("C:\\Users\\À±ÇýÁÖ\\Downloads\\2018-2ÇÐ±â\\ÇÁÀ×", imageName + ".jpg");
+         FileInputStream fileIn = new FileInputStream(f);
+         
+         byte[] buf = new byte[1024];
+         while(fin.read(buf)>0) {
+            fout.write(buf);
+            fout.flush();
+         }
+            fout.close();               
+         
+         out.close();
+         in.close();
+         fileSocket.close();*/
          fileClientSocket.close();
          
       } catch (Exception e) {
@@ -78,22 +107,22 @@ public class fileClient {
            String imageName = "ÀÍ½º»÷ÇÁ¶õ01";
            fout.writeObject((String)imageName);
            System.out.println("file name: " + imageName);
-           //File f = new File("C:\\Users\\À±ÇýÁÖ\\Downloads\\2018-2ÇÐ±â\\ÇÁÀ×", imageName + ".jpg");
+           File f = new File("C:\\Users\\À±ÇýÁÖ\\Downloads\\2018-2ÇÐ±â\\ÇÁÀ×", imageName + ".jpg");
            //FileInputStream fileIn = new FileInputStream(f);
-           FileOutputStream fos = new FileOutputStream("C:\\Users\\À±ÇýÁÖ\\Downloads\\test.png");
-          //FileOutputStream fos = new FileOutputStream(f);
+          FileOutputStream fos = new FileOutputStream(f);
           // ObjectInputStream ois = new ObjectInputStream(fileSocket.getInputStream());
-           byte[] buf = new byte[8192];
-          int bytesRead =0;
+           byte[] buf = new byte[1024];
+           int n =0;
+    	   int cnt = 0;
+    	   long fileSize = 0;
           // while(fin.read(buf, 0, 1024) ) {
-           while ((bytesRead = fin.read(buf)) >0) {
-        	  //fileSize += n;
-              fos.write(buf, 0, bytesRead);
-             // cnt++;
+           while ((n = fin.read(buf)) != -1) {
+        	  fileSize += n;
+              fout.write(buf);
+              fout.flush();
+              cnt++;
            }
-           fos.flush();
-           fos.close();
-             // this.fout.close();               
+              this.fout.close();               
     	   } catch (Exception e) {
     		   e.printStackTrace();
     	   } finally {
