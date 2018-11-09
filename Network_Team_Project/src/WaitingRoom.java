@@ -52,6 +52,7 @@ public class WaitingRoom extends Room {
 					try {
 						System.out.println("Enter protocol 111");
 						int roomNumber = makeChatRoom();
+						makeFileRoom(roomNumber+1);
 						
 						toClient.writeObject(roomNumber);
 						
@@ -70,20 +71,10 @@ public class WaitingRoom extends Room {
 				} else if (222 == protocol) { // Enter the room
 					System.out.println("Enter protocol 222");
 
-					int fileRoomNumber = makeFileRoom();
-					toClient.writeObject(fileRoomNumber);
-					System.out.println(fileRoomNumber + " file room made");
-
-					//int PIN = (Integer)fromClient.readObject();
-					int filePIN = (Integer)fromClient.readObject();
-					//System.out.println("Enter room Pin in " + PIN);
-					System.out.println("Enter File room Pin in " + fileRoomNumber);
-					//enterChatRoom(PIN);
-					enterFileRoom(fileRoomNumber);
-
 					int PIN = (Integer) fromClient.readObject();
 					System.out.println("Enter room Pin in " + PIN);
 					enterChatRoom(PIN);
+					enterFileRoom(PIN+1);
 
 				} else if (888 == protocol) {
 					toClient.close();
@@ -133,7 +124,7 @@ public class WaitingRoom extends Room {
 	// For ChatRoom
 	// ============================================================================================
 	/**
-	 * makeRoom
+	 * makeChatRoom
 	 * 
 	 * 이 함수는 사용자가 방 만들기 버튼을 누르고, 올바른 옵션을 입력한 후 채팅방의 서버소켓을 할당하는 함수 이다. 유니크한 핀번호를 가지게
 	 * 될때 까지 핀 번호를 할당을 시도한다.
@@ -192,23 +183,18 @@ public class WaitingRoom extends Room {
 	 * 
 	 * @return : 파일룸의 PIN 번호를 리턴해준다. (채팅방의 PIN 번호는 짝수이다.)
 	 */
-	private int makeFileRoom() throws Exception {
-		int PIN;
+	private void makeFileRoom(int fileRM) throws Exception {
 		System.out.println("Enter makeFileRoom");
 		synchronized (fileRoomServerSockets) {
 
-			PIN = makePIN();
-			PIN++;
-
-			if (fileRoomServerSockets.containsKey((Integer) PIN)) {
+			if (fileRoomServerSockets.containsKey((Integer) fileRM)) {
 				System.out.println("eeeeeeaaaaak - file");
 			}
-			ServerSocket tempSV = new ServerSocket(PIN);
+			ServerSocket tempSV = new ServerSocket(fileRM);
 
-			fileRoomServerSockets.put(PIN, tempSV);
+			fileRoomServerSockets.put(fileRM, tempSV);
 		}
 		System.out.println("end makeFileRoom");
-		return PIN;
 	}
 
 	/**
@@ -224,7 +210,7 @@ public class WaitingRoom extends Room {
 	private static boolean enterFileRoom(int PIN) {
 		if (fileRoomServerSockets.containsKey(PIN)) {
 			try {
-				new ChatRoom(fileRoomServerSockets.get(PIN).accept()).start();
+				new FileRoom(fileRoomServerSockets.get(PIN).accept()).start();
 				System.out.println("enterFileroom very good");
 				return true;
 			} catch (Exception e) {
