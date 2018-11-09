@@ -1,13 +1,2 @@
-/MyPackage/
-<<<<<<< HEAD
-=======
-/ReServer.class
-/WaitingRoom.class
-/basic/
-<<<<<<< HEAD
-/fileClient.class
-=======
-/ClientTest.class
->>>>>>> dd3f895d3f210e0a3a4c7a63df90579f112b8c58
 /Client$Chatting.class
->>>>>>> 2a3bcd334e9e1ac8d60c55dfd45db95d0583fc34
+/basic/

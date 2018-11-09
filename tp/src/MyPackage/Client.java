@@ -195,13 +195,6 @@ public class Client extends JFrame {
          
       
       
-      
-      
-      
-        
-        
-        
-        
       //이 밑으로는 프로토콜 코드 필요
       
       

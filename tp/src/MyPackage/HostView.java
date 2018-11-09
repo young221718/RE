@@ -140,8 +140,7 @@ public class HostView extends JFrame {
             	});
                
                main.disposeHost();// 현재 confirm 눌렀을때 창 사라지는 disposeHost가 등록되어있다. 이위에다 전송하는 코드 넣어야함
-               
-            
+
             }
         });
     }
