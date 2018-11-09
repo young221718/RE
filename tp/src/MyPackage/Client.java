@@ -163,7 +163,11 @@ public class Client extends JFrame {
         	  info.securityQuestion = hostView.secQText.getText();
         	  info.securityAnswer = hostView.secAText.getText();
         	  info.howManyPeople = hostView.joinNum.getSelectedIndex()+1;
-        	  System.out.println(info.groupName + info.securityQuestion + info.howManyPeople);
+        	  //System.out.println(info.groupName + info.securityQuestion + info.howManyPeople);
+        	  
+        	  
+        	  
+        	  
            }
        });
        
