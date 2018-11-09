@@ -31,7 +31,7 @@ public class WaitingRoom extends Room {
 
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
-			System.out.println("good connection.");
+
 			// 사용자가 waiting room에서 하는 일을 확인
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {

@@ -10,7 +10,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,22 +19,17 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-//in.readObject();
+
 
 public class Client extends JFrame {
 	
-	 protected static final String pinNumber = null;
-	 ObjectInputStream in;
-     ObjectOutputStream out;
-	
    LoginView loginView;
    HostView hostView;
-//   ObjectInputStream in;
-    PrintWriter OUT;
+   ObjectInputStream in;
+    PrintWriter out;
     RoomInformation info;
  
     static Client frame = new Client();
-	protected Object txtrPn;
     	
        JPanel contentPane;
        JTextField txtPinNum;
@@ -74,7 +68,7 @@ public class Client extends JFrame {
               btnEntrance.addActionListener(new ActionListener() {
                   public void actionPerformed(ActionEvent arg0) {
                  	//흐음......... 채팅방 들어가는 부분
-                	// ???????
+                	 // ???????
                   }
  				
                });
@@ -115,16 +109,15 @@ public class Client extends JFrame {
               
               textField.addActionListener(new ActionListener() { /*문장 입력하는 부분*/
                   public void actionPerformed(ActionEvent e) {
-                	  OUT.println(textField.getText());
+                      out.println(textField.getText());
                       textField.setText("");
                   }
               });
               
               
-              JTextArea txtrPn = new JTextArea();  //Showing Pin Number
+              JTextArea txtrPn = new JTextArea();
               txtrPn.setEditable(false);
-              
-              //txtrPn.setText("Showing Pin Number");
+              txtrPn.setText("Showing Pin Number");
               txtrPn.setBounds(645, 20, 263, 38);
               contentPane.add(txtrPn);
            }
@@ -170,24 +163,9 @@ public class Client extends JFrame {
         	  info.securityQuestion = hostView.secQText.getText();
         	  info.securityAnswer = hostView.secAText.getText();
         	  info.howManyPeople = hostView.joinNum.getSelectedIndex()+1;
-        	  info.endDate = null;
-        	  info.startDate = null;
         	  //System.out.println(info.groupName + info.securityQuestion + info.howManyPeople);
-        	 
         	  
-        	  try {
-        		 out.writeInt(111);
-        		 out.flush();
-        		 out.writeObject(info);
-        		 out.flush();
-        		 
-        		 Object pinNumber = in.readObject(); //
-        		 //Client.Client().txtrPn.setText(pinNumber);
-        		 
-			} catch (IOException | ClassNotFoundException e1) {
-				e1.printStackTrace();
-			} 
-        			
+        	  
         	  
         	  
            }
@@ -195,13 +173,7 @@ public class Client extends JFrame {
        
        
     }
-    protected static Object Client() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	public void disposeHost() {
+    public void disposeHost() {
        hostView.dispose();
     }
     
@@ -216,7 +188,7 @@ public class Client extends JFrame {
       
 
 	    String serverAddress = getServerAddress(); //서버의 주소 담을 변수
-        Socket socket = new Socket(serverAddress, 1234); 
+        Socket socket = new Socket(serverAddress, 9001); //소켓생성과 서버의 IP받기
         ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());  
      
