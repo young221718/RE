@@ -1,17 +1,17 @@
-<<<<<<< HEAD:Network_Team_Project/src/Client.java
-import java.io.BufferedOutputStream;
-=======
 package server;
->>>>>>> e8dcdb5ee410bc70301bf0a1eda599e40656785d:Network_Team_Project/src/server/Client.java
+
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
+
 
 import basic.RoomInformation;
 
@@ -95,7 +95,6 @@ public class Client {
          }
       }
 
-<<<<<<< HEAD:Network_Team_Project/src/Client.java
       public void run() {
          // 채팅방 test 
          Scanner keyboard = new Scanner(System.in);
@@ -130,7 +129,10 @@ public class Client {
    
    
    private static class Transmission extends Thread {
-     
+        // Socket fileSocket = new Socket(host, roomNum);
+          //ObjectOutputStream fout = new ObjectOutputStream(fileSocket.getOutputStream());
+          //ObjectInputStream fin = new ObjectInputStream(fileSocket.getInputStream());
+          
          Socket fileSocket;
          ObjectInputStream fin;
          ObjectOutputStream fout;
@@ -139,6 +141,7 @@ public class Client {
              try {
                InetAddress host = InetAddress.getLocalHost(); // 로컬 주소 받아오기
                this.fileSocket = new Socket(host, rm+1);
+               //this.fout = new ObjectOutputStream(fileSocket.getOutputStream());
                this.fin = new ObjectInputStream(fileSocket.getInputStream());
             } catch (IOException e) {
                e.printStackTrace();
@@ -148,29 +151,36 @@ public class Client {
           }
           public void run() {
              try {
-            	
-                //String str = fromClient.readLine();
-                String str = "test1";
-                System.out.println("sending file name: " + str + "\n");
-               
-                BufferedOutputStream out = new BufferedOutputStream( fileSocket.getOutputStream() );
-                FileInputStream fileIn = new FileInputStream( "C:\\Users\\윤혜주\\Downloads\\2018-2학기\\프잉\\us1.png"); // 받아올 파일 위치 및 이름
-                byte[] buffer = new byte[8192];
-                int bytesRead =0;
-                while ((bytesRead = fileIn.read(buffer)) > 0) { // 파일 바이트로 읽어서 전송
-                    out.write(buffer, 0, bytesRead);
-                }
-                out.flush();
-                out.close();
-                fileIn.close();
+            	   //fromClient = new ObjectInputStream(roomSocket.getInputStream());
+                  //fin = new ObjectInputStream(fileSocket.getInputStream());
+                   
+                 //String str = fromClient.readLine();
+                    String str = "test1";
+                 System.out.println("sending file name: " + str + "\n");
+                
+                 BufferedOutputStream out = new BufferedOutputStream( fileSocket.getOutputStream() );
+                 FileInputStream fileIn = new FileInputStream( "C:\\Users\\윤혜주\\Downloads\\2018-2학기\\프잉\\us1.png");
+                 byte[] buffer = new byte[8192];
+                 int bytesRead =0;
+                 while ((bytesRead = fileIn.read(buffer)) > 0) {
+                     out.write(buffer, 0, bytesRead);
+                 }
+                 out.flush();
+                 out.close();
+                 fileIn.close();
 
-                 
-                System.out.println(str + " file recieve success");
+                  
+                    System.out.println(str + " file recieve success");
+                    
+              
              } catch (Exception e) {
                 e.printStackTrace();
              } finally {
                 try {
                    fileSocket.close();
+                   //fin.close();
+                  
+                   //fout.close();
                 } catch (Exception e) {
                    e.printStackTrace();
                 }
@@ -178,101 +188,3 @@ public class Client {
           }
    }
 }
-=======
-		public void run() {
-			// 채팅방 test 
-			Scanner keyboard = new Scanner(System.in);
-			try {
-				
-				for (int i = 0; i < 1; i++) {
-					System.out.print("Enter Message: ");
-					// 이 부부은 바꿔서 키보드로 입력하는 부분에 넣으면 될것같아요! =============
-					String temp = keyboard.nextLine();
-					cout.writeObject(temp);
-					cout.flush();
-					// =====================================================
-					System.out.println((String) cin.readObject()); // 이건 채팅 뜨는데에 넣으면 될것같아요
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					// 소켓과 스트림 종료
-					chatSocket.close();
-					cin.close();
-					cout.close();
-					keyboard.close();
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-	// ===============================================================================
-	
-	
-	private static class Transmission extends Thread {
-		  // Socket fileSocket = new Socket(host, roomNum);
-	       //ObjectOutputStream fout = new ObjectOutputStream(fileSocket.getOutputStream());
-	       //ObjectInputStream fin = new ObjectInputStream(fileSocket.getInputStream());
-	       
-		   Socket fileSocket;
-		   ObjectInputStream fin;
-		   ObjectOutputStream fout;
-		   
-	       public Transmission(int rm) {
-	    	   try {
-					InetAddress host = InetAddress.getLocalHost(); // 로컬 주소 받아오기
-					this.fileSocket = new Socket(host, rm+1);
-					this.fout = new ObjectOutputStream(fileSocket.getOutputStream());
-					this.fin = new ObjectInputStream(fileSocket.getInputStream());
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-	       }
-	       public void run() {
-	    	   try {
-	    	// 파일룸 test
-	           int i=0;
-	           fout.writeObject((Integer)i);
-	           fout.flush();
-	           
-	           //String groupN = (String)fin.readObject(); // 그룹명
-	           //String str = (String)in.readObject();
-	           String imageName = "익스샌프란01";
-	           fout.writeObject((String)imageName);
-	           System.out.println("file name: " + imageName);
-	           File f = new File("C:\\Users\\윤혜주\\Downloads\\2018-2학기\\프잉", imageName + ".jpg");
-	           //FileInputStream fileIn = new FileInputStream(f);
-	          FileOutputStream fos = new FileOutputStream(f);
-	          // ObjectInputStream ois = new ObjectInputStream(fileSocket.getInputStream());
-	           byte[] buf = new byte[1024];
-	           int n =0;
-	    	   int cnt = 0;
-	    	   long fileSize = 0;
-	          // while(fin.read(buf, 0, 1024) ) {
-	           while ((n = fin.read(buf)) != -1) {
-	        	  fileSize += n;
-	              fout.write(buf);
-	              fout.flush();
-	              cnt++;
-	           }
-	              this.fout.close();               
-	    	   } catch (Exception e) {
-	    		   e.printStackTrace();
-	    	   } finally {
-	    		   try {
-	    			   fileSocket.close();
-	    			   this.fin.close();
-	    			   this.fout.close();
-	    		   } catch (Exception e) {
-	    			   e.printStackTrace();
-	    		   }
-	    	   }
-	       }
-	   }
-}
->>>>>>> e8dcdb5ee410bc70301bf0a1eda599e40656785d:Network_Team_Project/src/server/Client.java
