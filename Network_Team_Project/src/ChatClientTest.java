@@ -44,8 +44,7 @@ public class ChatClientTest {
 			Chatting ch = new Chatting(roomNum);
 			ch.start(); // 채팅 쓰레드를 시작
 			while(ch.isAlive());
-			Transmission tr = new Transmission(roomNum); 
-			tr.start();
+			
 			
 			//==================================================================
 			System.out.println("Chatting & FILE is dead");
@@ -120,66 +119,5 @@ public class ChatClientTest {
 	// ===============================================================================
 	
 	
-	private static class Transmission extends Thread {
-		  // Socket fileSocket = new Socket(host, roomNum);
-	       //ObjectOutputStream fout = new ObjectOutputStream(fileSocket.getOutputStream());
-	       //ObjectInputStream fin = new ObjectInputStream(fileSocket.getInputStream());
-	       
-		   Socket fileSocket;
-		   ObjectInputStream fin;
-		   ObjectOutputStream fout;
-		   
-	       public Transmission(int rm) {
-	    	   try {
-					InetAddress host = InetAddress.getLocalHost(); // 로컬 주소 받아오기
-					this.fileSocket = new Socket(host, rm+1);
-					this.fout = new ObjectOutputStream(fileSocket.getOutputStream());
-					this.fin = new ObjectInputStream(fileSocket.getInputStream());
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-	       }
-	       public void run() {
-	    	   try {
-	    	// 파일룸 test
-	           int i=0;
-	           fout.writeObject((Integer)i);
-	           fout.flush();
-	           
-	           //String groupN = (String)fin.readObject(); // 그룹명
-	           //String str = (String)in.readObject();
-	           String imageName = "익스샌프란01";
-	           fout.writeObject((String)imageName);
-	           System.out.println("file name: " + imageName);
-	           File f = new File("C:\\Users\\윤혜주\\Downloads\\2018-2학기\\프잉", imageName + ".jpg");
-	           //FileInputStream fileIn = new FileInputStream(f);
-	          FileOutputStream fos = new FileOutputStream(f);
-	          // ObjectInputStream ois = new ObjectInputStream(fileSocket.getInputStream());
-	           byte[] buf = new byte[1024];
-	           int n =0;
-	    	   int cnt = 0;
-	    	   long fileSize = 0;
-	          // while(fin.read(buf, 0, 1024) ) {
-	           while ((n = fin.read(buf)) != -1) {
-	        	  fileSize += n;
-	              fout.write(buf);
-	              fout.flush();
-	              cnt++;
-	           }
-	              this.fout.close();               
-	    	   } catch (Exception e) {
-	    		   e.printStackTrace();
-	    	   } finally {
-	    		   try {
-	    			   fileSocket.close();
-	    			   this.fin.close();
-	    			   this.fout.close();
-	    		   } catch (Exception e) {
-	    			   e.printStackTrace();
-	    		   }
-	    	   }
-	       }
-	   }
+	
 }
