@@ -25,11 +25,14 @@ public class RoomInformation implements Serializable{
 		this.endDate = endDate;
 	}
 	public void print() {
+		
+		
 		System.out.println();
 		System.out.println("=========================================================");
 		System.out.println("Group Name: " + groupName);
 		System.out.println("Port: " + port);
 		System.out.println("People: " + howManyPeople);
+		System.out.println("EndDate: " + endDate.get(Calendar.YEAR) +"-"+endDate.get(Calendar.MONTH)+"-"+endDate.get(Calendar.DATE));
 		System.out.println("Question: " + securityQuestion);
 		System.out.println("Answer: " + securityAnswer);
 		System.out.println("=========================================================");

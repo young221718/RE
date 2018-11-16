@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-
+import java.util.Calendar;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -153,8 +153,13 @@ public class Client extends JFrame {
 				info.securityQuestion = hostView.secQText.getText();
 				info.securityAnswer = hostView.secAText.getText();
 				info.howManyPeople = hostView.joinNum.getSelectedIndex() + 1;
-				// info.endDate.set(Integer.parseInt(hostView.yearText.getText()),Integer.parseInt(hostView.monthText.getText()),Integer.parseInt(hostView.dateText.getText()));
-				// Calendar cal= Calendar.getInstance();
+			    
+			    info.endDate.set(Calendar.YEAR , Integer.parseInt(hostView.yearText.getText()));
+			    info.endDate.set(Calendar.MONTH , Integer.parseInt(hostView.monthText.getText()));
+			    info.endDate.set(Calendar.DAY_OF_MONTH , Integer.parseInt(hostView.dateText.getText()));
+			    
+			    System.out.println("Year : " + info.endDate.get(Calendar.YEAR));
+			    System.out.println("Month : " + info.endDate.get(Calendar.MONTH));
 
 				try {
 					out.writeInt(111);
