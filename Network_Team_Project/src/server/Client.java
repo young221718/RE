@@ -1,3 +1,4 @@
+package server;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.util.Scanner;
 
 import basic.RoomInformation;
 
-public class ChatClientTest {
+public class Client {
 
 	public static void main(String[] args) {
 		try {
@@ -43,10 +44,12 @@ public class ChatClientTest {
 			// 채팅을 시작함========================================================
 			Chatting ch = new Chatting(roomNum);
 			ch.start(); // 채팅 쓰레드를 시작
-			while(ch.isAlive());
-			Transmission tr = new Transmission(roomNum); 
+			Transmission tr = new Transmission(roomNum);
 			tr.start();
-			
+			while(ch.isAlive() || tr.isAlive()) {
+				// 채팅방이 살아있을 때까지 아무것도 안함
+				// TODO: 수정이 필요함
+			}
 			//==================================================================
 			System.out.println("Chatting & FILE is dead");
 			

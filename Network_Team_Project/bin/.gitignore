@@ -1,14 +1,3 @@
-/ChatClientTest$Chatting.class
-/ChatClientTest$Transmission.class
-/ChatClientTest.class
-/ChatRoom.class
-/Client$Chatting.class
-/Client$Transmission.class
-/Client.class
-/FileRoom.class
-/MyPackage/
-/ReServer.class
-/WaitingRoom.class
 /basic/
-/fileClient$Transmission.class
-/fileClient.class
+/client/
+/server/
