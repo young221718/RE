@@ -1,9 +1,10 @@
-package server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,7 +26,6 @@ public class FileRoom extends Room{
    public void run() {
       System.out.println("Enter the FileRoom!");
       try {
-<<<<<<< HEAD:Network_Team_Project/src/FileRoom.java
     	  toClient = new ObjectOutputStream(roomSocket.getOutputStream());
     	  
     	  String imageName = "ÀÍ½º»÷ÇÁ¶õ01"; // ¹Þ¾Æ¿Ã ÆÄÀÏ ÀÌ¸§
@@ -42,36 +42,6 @@ public class FileRoom extends Room{
            }
            out.flush();
            out.close();
-=======
-         fromClient = new ObjectInputStream(roomSocket.getInputStream());
-         toClient = new ObjectOutputStream(roomSocket.getOutputStream());
-         
-         groupName = (String)fromClient.readObject();
-         //File f = new File("C:\\Users\\", groupName);
- 
-         String str = (String)fromClient.readObject();
-      System.out.println("sending file name: " + str);
-      File f = new File("C:\\Users\\À±ÇýÁÖ\\Downloads\\", str + ".jpg");
-      FileInputStream fis = new FileInputStream(f);
-      
-      byte[] buf = new byte[1024];
-      while(fromClient.read(buf)>0)
-      {
-         toClient.writeObject(buf);
-         toClient.flush();
-         
-      }
-         
-       /*  ObjectOutputStream fout = new ObjectOutputStream();
-         
-         byte[] buffer = new byte[1024];
-         int bytesRead = 0;
-         while ((bytesRead = fromClient.read(buffer))>=0) {
-            toClient.write(buffer, 0, bytesRead);
-            toClient.flush();
-         }*/
-         System.out.println(str + " file recieve success");
->>>>>>> e8dcdb5ee410bc70301bf0a1eda599e40656785d:Network_Team_Project/src/server/FileRoom.java
          
       } catch (IOException e) {
          e.printStackTrace();

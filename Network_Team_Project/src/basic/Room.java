@@ -12,9 +12,6 @@ public abstract class Room extends Thread{
    protected RoomInformation roomInfor;
    protected int portNumber;
    protected int protocol;
-   protected String Email;
-   protected String Name;
-   protected String groupName;
    
    public Room(Socket socket){
       this.roomSocket = socket;
