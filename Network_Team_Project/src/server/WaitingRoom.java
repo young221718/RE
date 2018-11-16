@@ -46,7 +46,7 @@ public class WaitingRoom extends Room {
 					// 만들 방의 옵션을 받아오고, 올바른지 확인한다.
 					// TODO : 서버에서 체크할건지, 클라이언트에서 체크할건지 생각해 보자
 					roomInfor = (RoomInformation) fromClient.readObject();
-					roomInfor.print();
+					roomInfor.print(); 
 
 					// 방 만들기 --> 서버 소켓을 만들어 놓는다.
 					// 방 만들기를 요청한 클라이언트에게 핀번호를 전송해준다.
