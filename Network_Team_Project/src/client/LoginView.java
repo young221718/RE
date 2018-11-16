@@ -10,14 +10,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import basic.RoomInformation;
  
+
 public class LoginView extends JFrame{
+	
     private Client main;
-   
-    private JButton btnLogin;
+    /////////////////////////////
+    private String userName;
+    private String emailAdd;
+    
+    public JButton btnLogin;
     private JButton btnInit;
-    private JPasswordField passText;
-    private JTextField userText,emailText;
+    public JPasswordField passText;
+    public JTextField userText,emailText;
     private boolean bLoginCheck;
    
     public static void main(String[] args) {

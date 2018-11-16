@@ -1,7 +1,9 @@
 package client;
+
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,32 +15,46 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import basic.RoomInformation;
 
-
 public class Client extends JFrame {
 
-	// protected static final String pinNumber = null;
 	ObjectInputStream in;
 	ObjectOutputStream out;
-	Socket socket;
+	Socket socket; // waitingRoom socket
+
+	String serverAddress = getServerAddress();
+	ObjectInputStream inChat;
+	ObjectOutputStream outChat;
+	Socket chatSocket; //chattingRomm socket
+
+	BufferedOutputStream outFile;
+	ObjectInputStream inFile;
+	Socket fileSocket;  //fileRoom socket
 
 	PrintWriter OUT; // 유저가 문장을 입력하는 부분에 사용됨
 	LoginView loginView;
 	HostView hostView;
 	RoomInformation info;
+	// UserInfomation data;
+	String userName;
+	String emailAdd;
 
 	JPanel contentPane;
 	JTextField txtPinNum;
 	JTextField textField;
 	JTextArea txtrPn;
+	JTextArea textArea;  //채팅내용 보여지는 곳
 
 	public Client() {
 		info = new RoomInformation();
+		// data = new UserInfomation();
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 940, 665);
 
@@ -52,9 +68,14 @@ public class Client extends JFrame {
 		egg.ta.setBounds(70, 20, 381, 434);
 		contentPane.add(egg.ta);
 
-		JTextArea textArea_1 = new JTextArea(); // 채팅내용 보여지는 부분
+		JTextArea textArea_1 = new JTextArea();// 파일명 보여지는 부분
+		textArea_1.setEditable(false);
 		textArea_1.setBounds(39, 493, 475, 113);
-		contentPane.add(textArea_1);
+		JScrollPane scroll = new JScrollPane(textArea_1);
+		scroll.setBounds(39, 493, 475, 113);
+		// contentPane.add(textArea_1);
+		contentPane.add(scroll);
+
 		/*
 		 * contentPane.add(new JScrollPane(textArea_1)); textArea_1.setEditable(false);
 		 */ // 파일명 나열_스크롤 만드는 부분
@@ -63,12 +84,34 @@ public class Client extends JFrame {
 		btnSending.setBounds(218, 446, 106, 27);
 		contentPane.add(btnSending);
 
-		JButton btnEntrance = new JButton("ENTRANCE");// Pin번호가 맞으면-> 채팅방 입장
+		JButton btnEntrance = new JButton("ENTRANCE");// 핀번호가 맞으면(TODO**맞는지 확인 : 보안질문으로??) -> 채팅방 입장
 		btnEntrance.setBounds(558, 67, 106, 38);
 		btnEntrance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// 흐음......... 채팅방 들어가는 부분
-				// ???????
+				try {
+					out.writeInt(222);  //채팅방에 들어가겠다는 신호
+					out.flush();
+					Integer roomNum = Integer.parseInt(txtPinNum.getText());  //user가 입력한 방번호 (String-->Integer)
+					out.writeObject(roomNum);  //서버에게 방번호를 보내주는 부분
+					out.flush();
+
+					chatSocket = new Socket(serverAddress, roomNum); // 소켓생성과 서버의 IP받기
+					outChat = new ObjectOutputStream(chatSocket.getOutputStream());
+					inChat = new ObjectInputStream(chatSocket.getInputStream());
+					
+					//TODO 쓰레드 끝내기
+					new ChatThread().start();  //채팅쓰레드 실행
+
+					/*
+					 * fileSocket = new Socket(serverAddress, roomNum+1); // 소켓생성과 서버의 IP받기 inFile =
+					 * new ObjectInputStream(fileSocket.getInputStream()); outFile = new
+					 * BufferedOutputStream(fileSocket.getOutputStream());
+					 */
+				} catch (IOException e) {
+
+					e.printStackTrace();
+				}
+
 			}
 
 		});
@@ -96,21 +139,21 @@ public class Client extends JFrame {
 		contentPane.add(textField);
 		textField.setColumns(10);
 
-		JTextArea textArea = new JTextArea(); // 채팅이 보여지는 부분
+		textArea = new JTextArea(); // 채팅이 보여지는 부분
 		textArea.setEditable(false);
 		textArea.setBounds(558, 117, 350, 444);
-		contentPane.add(textArea);
-
-		/*
-		 * ontentPane.add(new JScrollPane(textArea_1)); textArea.setEditable(false);
-		 * 
-		 * JScrollPane scrollPane1 = new JScrollPane(textArea);
-		 * contentPane.add(scrollPane1);
-		 */ // 스크롤 만드는 부분 -> 마지막에 자동 스크롤로 바꾸기
+		JScrollPane scrollArea = new JScrollPane(textArea);
+		textArea.setCaretPosition(textArea.getDocument().getLength());
+		scrollArea.setBounds(558, 117, 350, 444);
+		contentPane.add(scrollArea);
 
 		textField.addActionListener(new ActionListener() { /* 문장 입력하는 부분 */
 			public void actionPerformed(ActionEvent e) {
-				OUT.println(textField.getText());
+				try {
+					outChat.writeObject((textField.getText() + '\n'));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 				textField.setText("");
 			}
 		});
@@ -133,6 +176,19 @@ public class Client extends JFrame {
 	private void getUserInfo() {
 		this.loginView = new LoginView(); // 로그인창 보이기
 		this.loginView.setMain(this);
+		// this.loginView.setData(userName, emailAdd);
+		loginView.btnLogin.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("name email");
+				userName = loginView.userText.getText();
+				emailAdd = loginView.emailText.getText();
+
+				System.out.println(userName); 
+				System.out.println(emailAdd);
+			}
+		});
+
 	}
 
 	public void disposeLogin() {
@@ -153,14 +209,14 @@ public class Client extends JFrame {
 				info.securityQuestion = hostView.secQText.getText();
 				info.securityAnswer = hostView.secAText.getText();
 				info.howManyPeople = hostView.joinNum.getSelectedIndex() + 1;
-			    
+
 				info.endDate = Calendar.getInstance();
-			    info.endDate.set(Calendar.YEAR , Integer.parseInt(hostView.yearText.getText()));
-			    info.endDate.set(Calendar.MONTH , Integer.parseInt(hostView.monthText.getText()));
-			    info.endDate.set(Calendar.DAY_OF_MONTH , Integer.parseInt(hostView.dateText.getText()));
-			    
-			    System.out.println("Year : " + info.endDate.get(Calendar.YEAR));
-			    System.out.println("Month : " + info.endDate.get(Calendar.MONTH));
+				info.endDate.set(Calendar.YEAR, Integer.parseInt(hostView.yearText.getText()));
+				info.endDate.set(Calendar.MONTH, Integer.parseInt(hostView.monthText.getText()));
+				info.endDate.set(Calendar.DAY_OF_MONTH, Integer.parseInt(hostView.dateText.getText()));
+
+				System.out.println("Year : " + info.endDate.get(Calendar.YEAR));
+				System.out.println("Month : " + info.endDate.get(Calendar.MONTH));
 
 				try {
 					out.writeInt(111);
@@ -169,10 +225,10 @@ public class Client extends JFrame {
 					out.writeObject(info);
 					out.flush();
 
-					String Pin = (String)in.readObject();
-					System.out.println(Pin);
-					
-					// Client.Client().txtrPn.setText(pinNumber);
+					Integer PinNumber = (Integer) in.readObject();
+					String PIN = String.valueOf(PinNumber); //방번호 저장
+					System.out.println(PIN); 
+					txtrPn.append(PIN);  //방번호를 보여주는 부분
 
 				} catch (IOException | ClassNotFoundException e1) {
 					e1.printStackTrace();
@@ -198,11 +254,10 @@ public class Client extends JFrame {
 		// 유저로부터 인풋받기
 		// 서버와의 통신담당
 
-		String serverAddress = getServerAddress(); // 서버의 주소 담을 변수
 		socket = new Socket(serverAddress, 1234); // 소켓생성과 서버의 IP받기
 		in = new ObjectInputStream(socket.getInputStream());
 		out = new ObjectOutputStream(socket.getOutputStream());
-		
+
 		System.out.println("Connected!");
 
 		/*
@@ -235,5 +290,20 @@ public class Client extends JFrame {
 			}
 		});
 
+	}
+
+	public class ChatThread extends Thread {  //채팅 쓰레드 
+		public void run() {
+			String line;
+			try {
+				while (true) {
+					line = (String) inChat.readObject();  //서버에서 문장 받아서 저장
+					textArea.append(line);  //채팅창에 출력
+
+				}
+			} catch (ClassNotFoundException | IOException e) {
+
+			}
+		}
 	}
 }
