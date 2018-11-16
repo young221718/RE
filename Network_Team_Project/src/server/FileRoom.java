@@ -37,7 +37,7 @@ public class FileRoom extends Room{
           System.out.println("file name: " + imageName);
          
           InputStream in = roomSocket.getInputStream();
-          FileOutputStream out = new FileOutputStream("C:\\Users\\À±ÇýÁÖ\\Downloads\\us1_test111.png"); 
+          FileOutputStream out = new FileOutputStream("C:\\work\\apple.jpg"); 
 
            byte[] buffer = new byte[8192];
            int bytesRead=0;
