@@ -1,21 +1,17 @@
-package MyPackage;
+package client;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
- 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.ComboBoxEditor;
+
+import basic.RoomInformation;
+
 
 public class HostView extends JFrame {
 
@@ -24,7 +20,7 @@ public class HostView extends JFrame {
       
     public JButton btnConfirm;
     private JButton btnInit;
-    public JTextField userText,numJoinText,secQText,secAText,dateText;
+    public JTextField userText,numJoinText,secQText,secAText,yearText,monthText,dateText;
     public JComboBox joinNum;
    
     public static void main(String[] args) {
@@ -76,15 +72,23 @@ public class HostView extends JFrame {
         userLabel6.setBounds(45, 130, 80, 25);
         panel.add(userLabel6);
         
+        JLabel userLabel7 = new JLabel("³â");
+        userLabel7.setBounds(245, 70, 15, 25);
+        panel.add(userLabel7);
+        
+        JLabel userLabel8= new JLabel("¿ù");
+        userLabel8.setBounds(295, 70, 15, 25);
+        panel.add(userLabel8);
+        
+        JLabel userLabel9= new JLabel("ÀÏ");
+        userLabel9.setBounds(345, 70, 15, 25);
+        panel.add(userLabel9);
+        
         
        
         userText = new JTextField(20);
         userText.setBounds(200, 10, 160, 25);
         panel.add(userText);
-       
-        /*numJoinText = new JTextField(20);
-        numJoinText.setBounds(200, 40, 160, 25);
-        panel.add(numJoinText);*/
         
         String[] number={"1", "2", "3", "4","5"};
         joinNum = new JComboBox(number);
@@ -94,9 +98,20 @@ public class HostView extends JFrame {
         
         
         
+        
+        yearText = new JTextField(20);
+        yearText.setBounds(200, 70, 40, 25);
+        panel.add(yearText);
+        
+        monthText = new JTextField(20);
+        monthText.setBounds(265, 70, 25, 25);
+        panel.add(monthText);
+        
         dateText = new JTextField(20);
-        dateText.setBounds(200, 70, 160, 25);
+        dateText.setBounds(315, 70, 25, 25);
         panel.add(dateText);
+        
+        
         
         secQText = new JTextField(20);
         secQText.setBounds(200, 100, 160, 25);
