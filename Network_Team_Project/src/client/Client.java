@@ -131,9 +131,8 @@ public class Client extends JFrame {
 	 */
 
 	private void getUserInfo() {
-		Client main = new Client();
-		main.loginView = new LoginView(); // 로그인창 보이기
-		main.loginView.setMain(main);
+		this.loginView = new LoginView(); // 로그인창 보이기
+		this.loginView.setMain(this);
 	}
 
 	public void disposeLogin() {
