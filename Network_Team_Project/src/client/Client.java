@@ -35,6 +35,7 @@ public class Client extends JFrame {
 	JPanel contentPane;
 	JTextField txtPinNum;
 	JTextField textField;
+	JTextArea txtrPn;
 
 	public Client() {
 		info = new RoomInformation();
@@ -113,8 +114,7 @@ public class Client extends JFrame {
 				textField.setText("");
 			}
 		});
-
-		JTextArea txtrPn = new JTextArea();
+		txtrPn = new JTextArea();
 		txtrPn.setEditable(false);
 		// txtrPn.setText("Showing Pin Number");
 		txtrPn.setBounds(645, 20, 263, 38);
@@ -154,6 +154,7 @@ public class Client extends JFrame {
 				info.securityAnswer = hostView.secAText.getText();
 				info.howManyPeople = hostView.joinNum.getSelectedIndex() + 1;
 			    
+				info.endDate = Calendar.getInstance();
 			    info.endDate.set(Calendar.YEAR , Integer.parseInt(hostView.yearText.getText()));
 			    info.endDate.set(Calendar.MONTH , Integer.parseInt(hostView.monthText.getText()));
 			    info.endDate.set(Calendar.DAY_OF_MONTH , Integer.parseInt(hostView.dateText.getText()));
@@ -168,7 +169,9 @@ public class Client extends JFrame {
 					out.writeObject(info);
 					out.flush();
 
-					Object pinNumber = in.readObject();
+					String Pin = (String)in.readObject();
+					System.out.println(Pin);
+					
 					// Client.Client().txtrPn.setText(pinNumber);
 
 				} catch (IOException | ClassNotFoundException e1) {
