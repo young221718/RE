@@ -2,25 +2,31 @@ package server;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 
+import basic.RoomInformation;
+
 public class Database {
 	Connection con = null;
 	PreparedStatement userPS = null;
+	PreparedStatement roomPS = null;
 
 	public static void main(String[] args) {
-		Database redb = new Database();
-
-		// System.out.println(redb.insertUserInfor("ChanYoung",
-		// "young221718@gmail.com"));
-		try {
-			redb.con.commit();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		 Database redb = new Database();
+		
+		 // System.out.println(redb.insertUserInfor("ChanYoung",
+		 // "young221718@gmail.com"));
+		 try {
+		 redb.con.commit();
+		 } catch (SQLException e) {
+		 // TODO Auto-generated catch block
+		 e.printStackTrace();
+		 }
+		
 	}
 
 	/**
@@ -30,8 +36,13 @@ public class Database {
 		try {
 			ConnectDB();
 			con.setAutoCommit(false);
-			String userPSQL = "insert into user_information values(?, ?);";
+
+			String userPSQL = "insert into user_information values(?, ?, ?);";
 			userPS = (PreparedStatement) con.prepareStatement(userPSQL);
+
+			String roomPSQL = "insert into room_informtaion values(?,?,?,?,?,?,?);";
+			roomPS = (PreparedStatement) con.prepareStatement(roomPSQL);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -58,19 +69,22 @@ public class Database {
 	 * insertUserInfor 유저 정보를 데이터베이스에 추가하고 싶을 때 쓰면 되는 함수이다.
 	 * 
 	 * @param name
-	 *            : user's name
+	 *            - user's name
 	 * @param email
-	 *            : user's email
-	 * @return if success return true, else return false
+	 *            - user's email
+	 * @param pw
+	 *            - user's password
+	 * @return boolean - if success return true, else return false
 	 */
-	public boolean insertUserInfor(String name, String email) {
+	public boolean InsertUserInfor(String name, String email, String pw) {
 
 		try {
 			userPS.setString(1, name);
 			userPS.setString(2, email);
+			userPS.setString(3, pw);
 
 			int count = userPS.executeUpdate();
-			if (count != 2) {
+			if (count != 3) {
 				return false;
 			}
 
@@ -79,6 +93,32 @@ public class Database {
 			return false;
 		}
 		return true;
+	}
+
+	public boolean InsertRoomInfor(RoomInformation rf) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		try {
+			Integer maxPeople = rf.howManyPeople;
+
+			Calendar temp = rf.startDate;
+			temp.add(rf.startDate.DATE, 1);
+			String id = ((Integer) rf.port).toString() + "." + sdf.format(temp.getTime()).substring(2);
+
+			 roomPS.setString(1, rf.groupName);
+			 roomPS.setString(2, id);
+			 roomPS.setString(3, df.format(rf.startDate.getTime()));
+			 roomPS.setString(4, df.format(rf.endDate.getTime()));
+			 roomPS.setString(5, maxPeople.toString());
+			 roomPS.setString(6, rf.securityQuestion);
+			 roomPS.setString(7, rf.securityAnswer);
+
+		} catch (Exception e) {
+
+		}
+
+		return true;
+
 	}
 
 	/**

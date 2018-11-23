@@ -73,7 +73,7 @@ public class WaitingRoom extends Room {
 					int PIN = (Integer) fromClient.readObject();
 					System.out.println("Enter room Pin in " + PIN);
 					enterChatRoom(PIN);
-					//enterFileRoom(PIN + 1);
+					enterFileRoom(PIN + 1);
 
 				} else if (888 == protocol) {
 					toClient.close();

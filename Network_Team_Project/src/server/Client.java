@@ -1,17 +1,14 @@
 package server;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Calendar;
 import java.util.Scanner;
-
 
 import basic.RoomInformation;
 
@@ -31,6 +28,8 @@ public class Client {
          out.flush();
          // 방 정보 보내기
          RoomInformation roomInfor = new RoomInformation("group1", -1, 3, "Who are you?", "I don't know", null);
+         roomInfor.startDate = Calendar.getInstance();
+         roomInfor.endDate = Calendar.getInstance();
          out.writeObject(roomInfor);
          out.flush();
          // 방의 핀번호 받아오기
@@ -47,6 +46,8 @@ public class Client {
          // =================================================================
          
          // 채팅을 시작함========================================================
+         
+         
          Chatting ch = new Chatting(roomNum);
          ch.start(); // 채팅 쓰레드를 시작
          Transmission tr = new Transmission(roomNum);
@@ -100,7 +101,7 @@ public class Client {
          Scanner keyboard = new Scanner(System.in);
          try {
             
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 100000; i++) {
                System.out.print("Enter Message: ");
                // 이 부부은 바꿔서 키보드로 입력하는 부분에 넣으면 될것같아요! =============
                String temp = keyboard.nextLine();
