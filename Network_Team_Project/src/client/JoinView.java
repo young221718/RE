@@ -18,11 +18,11 @@ public class JoinView extends JFrame {
 	
 	private Client getInfo;
 	
-	private JPanel contentPane;
-	private JTextField JoinName;
-	private JTextField JoinEmailAdd;
-	private JTextField Joinpass;
-	private JTextField JoinCheck;
+	public JPanel contentPane;
+	public JTextField JoinName;
+	public JTextField JoinEmailAdd;
+	public JTextField Joinpass;
+	public JTextField JoinCheck;
 	public JButton btnConfirm;
 
 
