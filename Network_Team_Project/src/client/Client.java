@@ -39,11 +39,12 @@ public class Client extends JFrame {
 
 	PrintWriter OUT; // 유저가 문장을 입력하는 부분에 사용됨
 	LoginView loginView;
+	JoinView joinView;
 	HostView hostView;
 	RoomInformation info;
 	// UserInfomation data;
-	String userName;
 	String emailAdd;
+	String passWord;
 
 	JPanel contentPane;
 	JTextField txtPinNum;
@@ -63,7 +64,7 @@ public class Client extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		DragNDrop egg = new DragNDrop();
+		DragNDrop egg = new DragNDrop();    //알 이미지 삽입과 드래그앤 드랍부
 		egg.ta.setIcon(new ImageIcon("R.PNG"));
 		egg.ta.setBounds(70, 20, 381, 434);
 		contentPane.add(egg.ta);
@@ -180,19 +181,45 @@ public class Client extends JFrame {
 		loginView.btnLogin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("name email");
-				userName = loginView.userText.getText();
+				System.out.println("email password");
 				emailAdd = loginView.emailText.getText();
+				passWord = loginView.passText.getText();
 
-				System.out.println(userName); 
-				System.out.println(emailAdd);
+				System.out.println(emailAdd); 
+				System.out.println(passWord);
+				
+				disposeLogin();
 			}
 		});
 
+		loginView.btnJoin.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getJoinInfo();
+			//	System.out.println("JoinJoin");
+			}
+		});
+		
+	}
+	private void getJoinInfo() {
+		this.joinView = new JoinView();
+		this.joinView.setMain(this);
+		this.joinView.setVisible(true);
+		
+		joinView.btnConfirm.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				disposeJoin();
+			}
+		});
+		//확인 버튼 누르면 비번확인--> 서버에게 정보 전달 --> 확인받으면  창닫기/ 못 받으면 '에러'메시치 출력 후  재입력 받기
 	}
 
 	public void disposeLogin() {
 		loginView.dispose(); // 로그인창닫기
+	}
+	public void disposeJoin() {
+		joinView.dispose(); // 로그인창닫기
 	}
 
 	// 호스트 버튼 눌렀을 시 실행될 메소드
@@ -273,7 +300,7 @@ public class Client extends JFrame {
 		 */
 
 		getUserInfo();
-
+		//getJoinInfo();
 		// 이 밑으로는 프로토콜 코드 필요
 	}
 
