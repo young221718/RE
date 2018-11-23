@@ -9,6 +9,9 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
@@ -16,8 +19,12 @@ import javax.swing.ImageIcon;
 
 public class DragNDrop extends JFrame implements DropTargetListener
 {
+	public Client main;
     JLabel ta;
     DropTarget dt;
+    java.util.List list;
+    List<String> listA = new ArrayList<String>();
+    int i=0,j=0;
 
     public DragNDrop()
     {
@@ -56,12 +63,17 @@ public class DragNDrop extends JFrame implements DropTargetListener
             try
             {
                 //파일명 얻어오기
-                java.util.List list = (java.util.List) tr.getTransferData(DataFlavor.javaFileListFlavor);
+                list = (java.util.List) tr.getTransferData(DataFlavor.javaFileListFlavor);
+                String strFile = list.toString();
+                listA.add(i,strFile);
+                main.FileArea.append(strFile+"\n");
+                
                 //파일명 출력
-                for(int i=0;i < list.size();i++)
+                for(int j=0;j < listA.size();j++)
                 {
-                    System.out.println(list.size() + "-" + list.get(i));
+                	System.out.println(listA.get(j));
                 }
+                i++;
             }
             catch (Exception e)
             {
@@ -74,6 +86,10 @@ public class DragNDrop extends JFrame implements DropTargetListener
     public void dropActionChanged(DropTargetDragEvent dtde)
     {
         System.out.println("dragActionChanged");
+    }
+    
+    public void setMain(Client main) {
+        this.main = main;
     }
     
 

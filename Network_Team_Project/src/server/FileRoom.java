@@ -49,7 +49,7 @@ public class FileRoom extends Room{
         //String groupN = (String)fin.readObject(); // ±×·ì¸í
           //String str = (String)in.readObject();
           
-          if(fpro == 77)
+          if(fPro == 77)
           {
         	  File f = new File("C:\\Users\\À±ÇýÁÖ\\Downloads\\folderNN\\groupNB"); // folderNN - Æú´õ, groupNB - group_id
         	  if(f.exists() == false)
@@ -60,10 +60,10 @@ public class FileRoom extends Room{
         	  int bytesRead=0;
         	  while ((bytesRead = in.read(buffer)) > 0) {
         		  out.write(buffer, 0, bytesRead);
+                  out.flush();
+                  out.close();
            }
-          } else (fpro == 88) {
-           out.flush();
-           out.close();
+          } else if(fPro == 88) {
           }
       } catch (IOException e) {
          e.printStackTrace();
