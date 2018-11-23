@@ -23,7 +23,7 @@ public class DragNDrop extends JFrame implements DropTargetListener
     JLabel ta;
     DropTarget dt;
     java.util.List list;
-    List<String> listA = new ArrayList<String>();
+    public List<String> listA = new ArrayList<String>();
     int i=0,j=0;
 
     public DragNDrop()
@@ -65,9 +65,10 @@ public class DragNDrop extends JFrame implements DropTargetListener
                 //파일명 얻어오기
                 list = (java.util.List) tr.getTransferData(DataFlavor.javaFileListFlavor);
                 String strFile = list.toString();
+                int length = strFile.length();
+                strFile = strFile.substring(1, length-1);
                 listA.add(i,strFile);
                 main.FileArea.append(strFile+"\n");
-                
                 //파일명 출력
                 for(int j=0;j < listA.size();j++)
                 {

@@ -4,7 +4,11 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.LineNumberInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -36,6 +40,7 @@ public class Client extends JFrame {
 	BufferedOutputStream outFile;
 	ObjectInputStream inFile;
 	Socket fileSocket;  //fileRoom socket
+	FileInputStream fileIn;
 
 	PrintWriter OUT; // 유저가 문장을 입력하는 부분에 사용됨
 	LoginView loginView;
@@ -52,6 +57,7 @@ public class Client extends JFrame {
 	JTextArea textArea;  //채팅내용 보여지는 곳
 	JTextArea FileArea;
 	DragNDrop egg;
+	JButton btnSending;
 
 	public Client() {
 		info = new RoomInformation();
@@ -82,10 +88,17 @@ public class Client extends JFrame {
 		 * contentPane.add(new JScrollPane(textArea_1)); textArea_1.setEditable(false);
 		 */ // 파일명 나열_스크롤 만드는 부분
 
-		JButton btnSending = new JButton("Sending"); // 파일 전송 버튼
+		btnSending = new JButton("Sending"); // 파일 전송 버튼
 		btnSending.setBounds(218, 446, 106, 27);
 		contentPane.add(btnSending);
+		btnSending.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				new FileThread().start();
 
+			}
+
+		});
 		JButton btnEntrance = new JButton("ENTRANCE");// 핀번호가 맞으면(TODO**맞는지 확인 : 보안질문으로??) -> 채팅방 입장
 		btnEntrance.setBounds(558, 67, 106, 38);
 		btnEntrance.addActionListener(new ActionListener() {
@@ -100,6 +113,11 @@ public class Client extends JFrame {
 					chatSocket = new Socket(serverAddress, roomNum); // 소켓생성과 서버의 IP받기
 					outChat = new ObjectOutputStream(chatSocket.getOutputStream());
 					inChat = new ObjectInputStream(chatSocket.getInputStream());
+					
+					//파일 소켓 연결
+					fileSocket = new Socket(serverAddress, roomNum+1);
+			        outFile = new BufferedOutputStream(fileSocket.getOutputStream());
+			        inFile = new ObjectInputStream(fileSocket.getInputStream());
 					
 					//TODO 쓰레드 끝내기
 					new ChatThread().start();  //채팅쓰레드 실행
@@ -308,4 +326,46 @@ public class Client extends JFrame {
 			}
 		}
 	}
-}
+	
+	public class FileThread extends Thread {
+		public void run() {
+			
+					
+					try {
+						outFile.write(77);
+						outFile.flush();
+						outFile.write(egg.listA.size());
+						for(int i=0;i < egg.listA.size();i++)
+		                {
+							//프로토콜
+							System.out.println(egg.listA.get(i));
+							fileIn = new FileInputStream(egg.listA.get(i));
+							System.out.println(egg.listA.get(0));
+							System.out.println(egg.listA.get(1));
+							 byte[] buffer = new byte[8192];
+			                 int bytesRead =0;
+			                 while ((bytesRead = fileIn.read(buffer)) > 0) {
+			                     outFile.write(buffer, 0, bytesRead);
+			                     //bytesRead 파일사이즈로 잡기
+			                 }
+			                 System.out.println("end\n");
+			                 outFile.flush();
+			                 
+			                 
+		                }
+						outFile.close();
+						fileIn.close();
+						
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+					
+					
+				}
+			
+		}
+	}
