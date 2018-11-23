@@ -156,11 +156,19 @@ public class Client {
                   //fin = new ObjectInputStream(fileSocket.getInputStream());
                    
                  //String str = fromClient.readLine();
+            	 
+            	 /*
+            	  * 
+            	  * foreach문으로  확인 - pro - 77(파일 전송), 88- 보낼 파일 없음
+            	  */
+            	
                     String str = "test1";
                  System.out.println("sending file name: " + str + "\n");
                 
                  BufferedOutputStream out = new BufferedOutputStream( fileSocket.getOutputStream() );
                  FileInputStream fileIn = new FileInputStream( "C:\\Users\\윤혜주\\Downloads\\2018-2학기\\프잉\\us1.png");
+                 //int FF_pro = 77;
+                 //out.write(FF_pro);
                  byte[] buffer = new byte[8192];
                  int bytesRead =0;
                  while ((bytesRead = fileIn.read(buffer)) > 0) {
@@ -171,7 +179,7 @@ public class Client {
                  fileIn.close();
 
                   
-                    System.out.println(str + " file recieve success");
+                 System.out.println(str + " file recieve success");
                     
               
              } catch (Exception e) {
