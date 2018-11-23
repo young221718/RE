@@ -13,27 +13,26 @@ import com.mysql.jdbc.Statement;
 import basic.RoomInformation;
 
 public class Database {
-	Connection con = null;
+	static Connection con = null;
 	PreparedStatement userPS = null;
 	PreparedStatement roomPS = null;
 
 	Statement stmt = null;
 	ResultSet rs = null;
 
-	public static void main(String[] args) {
-		Database redb = new Database();
-
-		System.out.println(redb.InsertUserInfor("ChanYoung", "young221718@gmail.com", "1234"));
-		System.out.println(redb.CheckPassword("young221718@gmail.com", "1234"));
-
-		// try {
-		// //redb.con.commit();
-		// } catch (SQLException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-
-	}
+//	public static void main(String[] args) {
+//		Database redb = new Database();
+//
+//		System.out.println(redb.InsertUserInfor("ChanYoung", "young221718@gmail.com", "1234"));
+//		System.out.println(redb.CheckPassword("young221718@gmail.com", "1234"));
+//
+//		// try {
+//		// //redb.con.commit();
+//		// } catch (SQLException e) {
+//		// // TODO Auto-generated catch block
+//		// e.printStackTrace();
+//		// }
+//	}
 
 	/**
 	 * constructor
@@ -41,14 +40,14 @@ public class Database {
 	public Database() {
 		try {
 			ConnectDB();
-			con.setAutoCommit(false);
+			synchronized (con) {
+				con.setAutoCommit(false);
+				String userPSQL = "insert into user_information(user_name,email,password) values(?, ?, ?);";
+				userPS = (PreparedStatement) con.prepareStatement(userPSQL);
 
-			String userPSQL = "insert into user_information(user_name,email,password) values(?, ?, ?);";
-			userPS = (PreparedStatement) con.prepareStatement(userPSQL);
-
-			String roomPSQL = "insert into room_informtaion values(?,?,?,?,?,?,?);";
-			roomPS = (PreparedStatement) con.prepareStatement(roomPSQL);
-
+				String roomPSQL = "insert into room_informtaion values(?,?,?,?,?,?,?);";
+				roomPS = (PreparedStatement) con.prepareStatement(roomPSQL);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -62,7 +61,9 @@ public class Database {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://localhost/re_db";
 			String user = "root", passwd = "12345";
-			con = (Connection) DriverManager.getConnection(url, user, passwd);
+			synchronized (con) {
+				con = (Connection) DriverManager.getConnection(url, user, passwd);
+			}
 			System.out.println(con);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -80,7 +81,7 @@ public class Database {
 	 *            - user's email
 	 * @param pw
 	 *            - user's password
-	 * @return int // 1: success // -1: already exist // -2: fail: sql error
+	 * @return int // 1: success // -1: already exist // 0: fail: sql error
 	 */
 	public int InsertUserInfor(String name, String email, String pw) {
 
@@ -189,6 +190,19 @@ public class Database {
 			if (roomPS != null && !roomPS.isClosed())
 				roomPS.close();
 		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * CommitDB : 데이터베이스를 커밋한다.
+	 */
+	public void CommitDB() {
+		try {
+			synchronized (con) {
+				con.commit();
+			}
+		} catch(SQLException e) {
 			e.printStackTrace();
 		}
 	}

@@ -24,67 +24,70 @@ public class WaitingRoom extends Room {
 
 	public void run() {
 		try {
-			System.out.println("Enter Waiting Room");
-			// TODO : 로그인 정보를 받고 올바르면 탈출
-			while (true) {
-				break; // 쓰레기 코드
-			}
 
+			db = new Database();
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
+
+			// TODO : 로그인 정보를 받고 올바르면 탈출
+			while (LogIn())
+				;
 
 			// 사용자가 waiting room에서 하는 일을 확인
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
+				// 사용자가 waiting room에서 하는 일을 확인
+				// 소켓이 연결되어 있을 때까지 유지된다.
+				while (roomSocket.isConnected()) {
 
-				protocol = (Integer) fromClient.readInt();
-				System.out.println("protocol: " + protocol);
-				// protocol
-				// 111 : 방을 만들고 싶다.
-				// 222 : 방에 들어가고 싶다.
-				if (111 == protocol) { // Make the room
-					// 만들 방의 옵션을 받아오고, 올바른지 확인한다.
-					// TODO : 서버에서 체크할건지, 클라이언트에서 체크할건지 생각해 보자
-					roomInfor = (RoomInformation) fromClient.readObject();
-					roomInfor.print(); 
+					protocol = (Integer) fromClient.readInt();
+					System.out.println("protocol: " + protocol);
+					// protocol
+					// 111 : 방을 만들고 싶다.
+					// 222 : 방에 들어가고 싶다.
+					if (111 == protocol) { // Make the room
+						// 만들 방의 옵션을 받아오고, 올바른지 확인한다.
+						// TODO : 서버에서 체크할건지, 클라이언트에서 체크할건지 생각해 보자
+						roomInfor = (RoomInformation) fromClient.readObject();
+						roomInfor.print();
 
-					// 방 만들기 --> 서버 소켓을 만들어 놓는다.
-					// 방 만들기를 요청한 클라이언트에게 핀번호를 전송해준다.
-					try {
-						System.out.println("Enter protocol 111");
-						int roomNumber = makeChatRoom();
-						makeFileRoom(roomNumber + 1);
+						// 방 만들기 --> 서버 소켓을 만들어 놓는다.
+						// 방 만들기를 요청한 클라이언트에게 핀번호를 전송해준다.
+						try {
+							System.out.println("Enter protocol 111");
+							int roomNumber = makeChatRoom();
+							makeFileRoom(roomNumber + 1);
 
-						toClient.writeObject(roomNumber);
-						toClient.flush();
-						System.out.println(roomNumber + " room made");
+							toClient.writeObject(roomNumber);
+							toClient.flush();
+							System.out.println(roomNumber + " room made");
 
-					} catch (Exception e) {
-						// TODO : 오류 프로토콜 처리해야한다!!!!!!
-						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
-						toClient.writeBytes("ERROR: FAILED MAKING FileROOM");
-						e.printStackTrace();
+						} catch (Exception e) {
+							// TODO : 오류 프로토콜 처리해야한다!!!!!!
+							toClient.writeBytes("ERROR: FAILED MAKING ROOM");
+							toClient.writeBytes("ERROR: FAILED MAKING FileROOM");
+							e.printStackTrace();
+						}
+						System.out.println("End Protocol 111");
+
+					} else if (222 == protocol) { // Enter the room
+						System.out.println("Enter protocol 222");
+
+						int PIN = (Integer) fromClient.readObject();
+						System.out.println("Enter room Pin in " + PIN);
+						enterChatRoom(PIN);
+						enterFileRoom(PIN + 1);
+
+					} else if (888 == protocol) {
+						toClient.close();
+						fromClient.close();
+						break;
+
+					} else {
+						// TODO : 프로토콜 예외 처리해야함.
 					}
-					System.out.println("End Protocol 111");
-
-				} else if (222 == protocol) { // Enter the room
-					System.out.println("Enter protocol 222");
-
-					int PIN = (Integer) fromClient.readObject();
-					System.out.println("Enter room Pin in " + PIN);
-					enterChatRoom(PIN);
-					enterFileRoom(PIN + 1);
-
-				} else if (888 == protocol) {
-					toClient.close();
-					fromClient.close();
-					break;
-
-				} else {
-					// TODO : 프로토콜 예외 처리해야함.
 				}
 			}
-
 		} catch (ClassNotFoundException e) {
 			System.out.println("Error 1");
 			e.printStackTrace();
@@ -107,17 +110,51 @@ public class WaitingRoom extends Room {
 	}
 
 	/**
-	 * logIn
+	 * LogIn
 	 * 
 	 * 이 함수는 첫 화면에서 사용자의 이메일과 이름을 받는 함수이다. 이메일은 유니크해야하며, 같은 이메일이 2개가 동시에 들어 올 수 없게
 	 * 해야한다.
 	 * 
 	 * @return : 로그인이 성공적으로 되었으면 true를 리턴, 다른 오류가 있을 경우 false 를 리턴한다.
 	 */
-	private boolean logIn() {
+	private boolean LogIn() {
 
+		try {
+			protocol = fromClient.readInt();
+			if (protocol == 170) { // 회원가입
+				String email = (String) fromClient.readObject();
+				String userName = (String) fromClient.readObject();
+				String password = (String) fromClient.readObject();
+
+				int result = db.InsertUserInfor(userName, email, password);
+				if (result == 1) {
+					toClient.writeInt(171); // success
+				} else if (result == -1) {
+					toClient.writeInt(175); // already exist
+				} else if (result == 0) {
+					toClient.writeInt(179); // sql error
+				}
+
+			} else if (protocol == 180) { // 로그인
+				String email = (String) fromClient.readObject();
+				String password = (String) fromClient.readObject();
+
+				int result = db.CheckPassword(email, password);
+				if (result == 1) {
+					toClient.writeInt(181); // success
+				} else if (result == 0) {
+					toClient.writeInt(183); // sql error
+				} else if (result == -1) {
+					toClient.writeInt(185); // wrong password
+				} else if (result == -2) {
+					toClient.writeInt(187); // not exist email
+				}
+
+			}
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		return true;
-
 	}
 
 	// For ChatRoom
@@ -139,7 +176,7 @@ public class WaitingRoom extends Room {
 				System.out.println("Already Exist - ChatRoom:" + PIN);
 			}
 			synchronized (roomInforMap) {
-				roomInforMap.put((Integer)PIN, roomInfor);
+				roomInforMap.put((Integer) PIN, roomInfor);
 			}
 			ServerSocket tempSS = new ServerSocket(PIN);
 			roomInfor.port = PIN;
@@ -162,7 +199,7 @@ public class WaitingRoom extends Room {
 	private static boolean enterChatRoom(int PIN) {
 		if (chatRoomServerSockets.containsKey(PIN)) {
 			try {
-				new ChatRoom(chatRoomServerSockets.get(PIN).accept(),roomInforMap.get(PIN)).start();
+				new ChatRoom(chatRoomServerSockets.get(PIN).accept(), roomInforMap.get(PIN)).start();
 
 				System.out.println("Method enterChatroom successed");
 				return true;
@@ -211,7 +248,7 @@ public class WaitingRoom extends Room {
 	private static boolean enterFileRoom(int PIN) {
 		if (fileRoomServerSockets.containsKey(PIN)) {
 			try {
-				new FileRoom(fileRoomServerSockets.get(PIN).accept(),roomInforMap.get(PIN-1)).start();
+				new FileRoom(fileRoomServerSockets.get(PIN).accept(), roomInforMap.get(PIN - 1)).start();
 				System.out.println("enterFileroom very good");
 				return true;
 			} catch (Exception e) {
