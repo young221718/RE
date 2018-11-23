@@ -13,7 +13,7 @@ import com.mysql.jdbc.Statement;
 import basic.RoomInformation;
 
 public class Database {
-	static Connection con = null;
+	Connection con = null;
 	PreparedStatement userPS = null;
 	PreparedStatement roomPS = null;
 
@@ -61,9 +61,8 @@ public class Database {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://localhost/re_db";
 			String user = "root", passwd = "12345";
-			synchronized (con) {
-				con = (Connection) DriverManager.getConnection(url, user, passwd);
-			}
+			con = (Connection) DriverManager.getConnection(url, user, passwd);
+			
 			System.out.println(con);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -199,9 +198,9 @@ public class Database {
 	 */
 	public void CommitDB() {
 		try {
-			synchronized (con) {
+			
 				con.commit();
-			}
+			
 		} catch(SQLException e) {
 			e.printStackTrace();
 		}
