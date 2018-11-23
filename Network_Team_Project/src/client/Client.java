@@ -50,6 +50,8 @@ public class Client extends JFrame {
 	JTextField textField;
 	JTextArea txtrPn;
 	JTextArea textArea;  //채팅내용 보여지는 곳
+	JTextArea FileArea;
+	DragNDrop egg;
 
 	public Client() {
 		info = new RoomInformation();
@@ -63,17 +65,17 @@ public class Client extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		DragNDrop egg = new DragNDrop();
-		egg.ta.setIcon(new ImageIcon("R.PNG"));
-		egg.ta.setBounds(70, 20, 381, 434);
-		contentPane.add(egg.ta);
+		this.egg = new DragNDrop();
+		this.egg.ta.setIcon(new ImageIcon("R.PNG"));
+		this.egg.ta.setBounds(70, 20, 381, 434);
+		this.contentPane.add(egg.ta);
+		this.egg.setMain(this);
 
-		JTextArea textArea_1 = new JTextArea();// 파일명 보여지는 부분
-		textArea_1.setEditable(false);
-		textArea_1.setBounds(39, 493, 475, 113);
-		JScrollPane scroll = new JScrollPane(textArea_1);
+		FileArea = new JTextArea();// 파일명 보여지는 부분
+		FileArea.setEditable(false);
+		FileArea.setBounds(39, 493, 475, 113);
+		JScrollPane scroll = new JScrollPane(FileArea);
 		scroll.setBounds(39, 493, 475, 113);
-		// contentPane.add(textArea_1);
 		contentPane.add(scroll);
 
 		/*
