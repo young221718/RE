@@ -24,15 +24,16 @@ public class WaitingRoom extends Room {
 
 	public void run() {
 		try {
-
+			System.out.println("Welcome Waiting Room");
 			db = new Database();
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 
 			// TODO : 로그인 정보를 받고 올바르면 탈출
-			while (LogIn())
+			while (!LogIn())
 				;
-
+			System.out.println("Success LogIn");
+			
 			// 사용자가 waiting room에서 하는 일을 확인
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
@@ -126,35 +127,53 @@ public class WaitingRoom extends Room {
 				String userName = (String) fromClient.readObject();
 				String password = (String) fromClient.readObject();
 
+				System.out.println("from client: " + email + " " + userName + " " + password);
+
 				int result = db.InsertUserInfor(userName, email, password);
 				if (result == 1) {
 					toClient.writeInt(171); // success
+					toClient.flush();
 				} else if (result == -1) {
 					toClient.writeInt(175); // already exist
+					toClient.flush();
 				} else if (result == 0) {
 					toClient.writeInt(179); // sql error
+					toClient.flush();
 				}
+				System.out.println("join " + result);
 
 			} else if (protocol == 180) { // 로그인
 				String email = (String) fromClient.readObject();
 				String password = (String) fromClient.readObject();
-
+				
+				System.out.println("from client: " + email + " "  + password);
+				
 				int result = db.CheckPassword(email, password);
 				if (result == 1) {
 					toClient.writeInt(181); // success
+					toClient.flush();
+					db.CommitDB();
+					return true;
 				} else if (result == 0) {
 					toClient.writeInt(183); // sql error
+					toClient.flush();
 				} else if (result == -1) {
 					toClient.writeInt(185); // wrong password
+					toClient.flush();
 				} else if (result == -2) {
 					toClient.writeInt(187); // not exist email
+					toClient.flush();
 				}
+				System.out.println("join " + result);
+				
 
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
+			return false;
 		}
-		return true;
+		db.CommitDB();
+		return false;
 	}
 
 	// For ChatRoom
