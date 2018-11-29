@@ -33,7 +33,7 @@ public class WaitingRoom extends Room {
 			while (!LogIn())
 				;
 			System.out.println("Success LogIn");
-			
+
 			// 사용자가 waiting room에서 하는 일을 확인
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
@@ -118,60 +118,55 @@ public class WaitingRoom extends Room {
 	 * 
 	 * @return : 로그인이 성공적으로 되었으면 true를 리턴, 다른 오류가 있을 경우 false 를 리턴한다.
 	 */
-	private boolean LogIn() {
+	private boolean LogIn() throws Exception {
 
-		try {
-			protocol = fromClient.readInt();
-			if (protocol == 170) { // 회원가입
-				String email = (String) fromClient.readObject();
-				String userName = (String) fromClient.readObject();
-				String password = (String) fromClient.readObject();
+		protocol = fromClient.readInt();
+		if (protocol == 170) { // 회원가입
+			String email = (String) fromClient.readObject();
+			String userName = (String) fromClient.readObject();
+			String password = (String) fromClient.readObject();
 
-				System.out.println("from client: " + email + " " + userName + " " + password);
+			System.out.println("from client: " + email + " " + userName + " " + password);
 
-				int result = db.InsertUserInfor(userName, email, password);
-				if (result == 1) {
-					toClient.writeInt(171); // success
-					toClient.flush();
-				} else if (result == -1) {
-					toClient.writeInt(175); // already exist
-					toClient.flush();
-				} else if (result == 0) {
-					toClient.writeInt(179); // sql error
-					toClient.flush();
-				}
-				System.out.println("join " + result);
-
-			} else if (protocol == 180) { // 로그인
-				String email = (String) fromClient.readObject();
-				String password = (String) fromClient.readObject();
-				
-				System.out.println("from client: " + email + " "  + password);
-				
-				int result = db.CheckPassword(email, password);
-				if (result == 1) {
-					toClient.writeInt(181); // success
-					toClient.flush();
-					db.CommitDB();
-					return true;
-				} else if (result == 0) {
-					toClient.writeInt(183); // sql error
-					toClient.flush();
-				} else if (result == -1) {
-					toClient.writeInt(185); // wrong password
-					toClient.flush();
-				} else if (result == -2) {
-					toClient.writeInt(187); // not exist email
-					toClient.flush();
-				}
-				System.out.println("join " + result);
-				
-
+			int result = db.InsertUserInfor(userName, email, password);
+			if (result == 1) {
+				toClient.writeInt(171); // success
+				toClient.flush();
+			} else if (result == -1) {
+				toClient.writeInt(175); // already exist
+				toClient.flush();
+			} else if (result == 0) {
+				toClient.writeInt(179); // sql error
+				toClient.flush();
 			}
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-			return false;
+			System.out.println("join " + result);
+
+		} else if (protocol == 180) { // 로그인
+			String email = (String) fromClient.readObject();
+			String password = (String) fromClient.readObject();
+
+			System.out.println("from client: " + email + " " + password);
+
+			int result = db.CheckPassword(email, password);
+			if (result == 1) {
+				toClient.writeInt(181); // success
+				toClient.flush();
+				db.CommitDB();
+				return true;
+			} else if (result == 0) {
+				toClient.writeInt(183); // sql error
+				toClient.flush();
+			} else if (result == -1) {
+				toClient.writeInt(185); // wrong password
+				toClient.flush();
+			} else if (result == -2) {
+				toClient.writeInt(187); // not exist email
+				toClient.flush();
+			}
+			System.out.println("join " + result);
+
 		}
+
 		db.CommitDB();
 		return false;
 	}
