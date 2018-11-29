@@ -110,7 +110,47 @@ public class Database {
 		}
 		return 1; // success
 	}
+	
+	/**
+	 * GetRoomQuetion: 방 보안질문을 받아오는 메소드
+	 * @param roomNum 방 번호
+	 * @return String 방 번호에 해당하는 질문이다.
+	 */
+	public String GetRoomQuestion(int roomNum) {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "select question from room_information where group_id =" + roomNum;
+			
+			if (rs.next()) {
+				return rs.getString(0); // return question
+			} else {
+				return null; // not exist room
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;		
+	}
+	
+	/**
+	 * CheckRoomAnswer
+	 * @param String an user's answer
+	 * @return int return 1 if success, return -1 if fail, return -2 if sql error
+	 */
+	public int CheckRoomAnswer(String an, int roomNum) {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "select * from room_information where answer ='" + an + "' and group_id =" + roomNum;
+			rs = stmt.executeQuery(sql);
+			
+			if(rs.next()) return 1; // success
+			else return -1; // fail
+		} catch(SQLException e) {
+			return -2; // sql error
+		}
+	}
 
+	
 	/**
 	 * CheckPassword - 로그인을 하기 위한 메서드
 	 * 
