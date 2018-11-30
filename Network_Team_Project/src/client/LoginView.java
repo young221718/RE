@@ -25,7 +25,8 @@ public class LoginView extends JFrame{
     public JButton btnJoin;
     public JButton btnLogin;
     //public JPasswordField ssText;
-    public JTextField emailText,passText;
+    public JTextField emailText;
+    public JPasswordField passText;
     private boolean bLoginCheck;
    
     public static void main(String[] args) {
@@ -37,7 +38,7 @@ public class LoginView extends JFrame{
         setTitle("login");
         setSize(280, 150);
         setResizable(false);
-        setBounds(100, 100, 940, 665);
+        setBounds(100, 100, 940, 665); //왼쪽, 위, 가로, 세로
        // setLocation(450, 350);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
        
@@ -75,9 +76,10 @@ public class LoginView extends JFrame{
         panel.add(PassLabel);
        
         
-        passText = new JTextField();
+        passText = new JPasswordField();
         passText.setBounds(122, 260, 181, 24);
         panel.add(passText);
+        passText.setEchoChar('*');
 		passText.setColumns(10);
         
         

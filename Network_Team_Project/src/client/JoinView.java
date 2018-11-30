@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -21,8 +22,8 @@ public class JoinView extends JFrame {
 	public JPanel contentPane;
 	public JTextField JoinName;
 	public JTextField JoinEmailAdd;
-	public JTextField Joinpass;
-	public JTextField JoinCheck;
+	public JPasswordField Joinpass;
+	public JPasswordField JoinCheck;
 	public JButton btnConfirm;
 
 
@@ -43,7 +44,7 @@ public class JoinView extends JFrame {
 		
 		setTitle("Join");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(350, 295, 470, 300);  //왼쪽, 아래, 가로, 세로
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -75,20 +76,23 @@ public class JoinView extends JFrame {
 		lblNewLabel.setBounds(91, 118, 78, 18);
 		contentPane.add(lblNewLabel);
 		
-		Joinpass = new JTextField();
+		
+		Joinpass = new JPasswordField();
 		Joinpass.setText("password");
 		Joinpass.setBounds(180, 115, 160, 24);
 		contentPane.add(Joinpass);
+		Joinpass.setEchoChar('*');
 		Joinpass.setColumns(10);
 		
 		JLabel lblPwCheck = new JLabel("Check PW");
 		lblPwCheck.setBounds(91, 151, 78, 18);
 		contentPane.add(lblPwCheck);
 		
-		JoinCheck = new JTextField();
+		JoinCheck = new JPasswordField();
 		JoinCheck.setText("check");
 		JoinCheck.setBounds(180, 148, 160, 24);
 		contentPane.add(JoinCheck);
+		JoinCheck.setEchoChar('*');
 		JoinCheck.setColumns(10);
 		
 		
@@ -96,7 +100,6 @@ public class JoinView extends JFrame {
 		btnConfirm.setBounds(156, 197, 105, 27);
 		contentPane.add(btnConfirm);
 		
-		setVisible(true);
 		
 	}
 

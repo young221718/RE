@@ -3,6 +3,7 @@ package client;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +35,7 @@ public class Client extends JFrame {
 	Socket socket; // waitingRoom socket
 
 	// String serverAddress = getServerAddress();
-	String serverAddress = "192.9.11.252";
+	String serverAddress = "192.9.11.113";
 
 	ObjectInputStream inChat;
 	ObjectOutputStream outChat;
@@ -45,14 +46,19 @@ public class Client extends JFrame {
 	Socket fileSocket; // fileRoom socket
 	FileInputStream fileIn;
 
+	Integer roomNum;
+	int valueQNA;
+	
 	PrintWriter OUT; // 유저가 문장을 입력하는 부분에 사용됨
 	LoginView loginView;
 	JoinView joinView;
 	HostView hostView;
 	RoomInformation info;
+	SecurityQnA securityQnA;
 	// UserInfomation data;
 	String emailAdd;
 	String passWord;
+	
 
 	JPanel contentPane;
 	JTextField txtPinNum;
@@ -63,6 +69,8 @@ public class Client extends JFrame {
 	DragNDrop egg;
 	JButton btnSending;
 
+	
+	
 	public Client() {
 		info = new RoomInformation();
 		// data = new UserInfomation();
@@ -74,6 +82,8 @@ public class Client extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		
+		
 
 		this.egg = new DragNDrop();
 		this.egg.ta.setIcon(new ImageIcon("R.PNG"));
@@ -103,6 +113,7 @@ public class Client extends JFrame {
 			}
 
 		});
+	
 		JButton btnEntrance = new JButton("ENTRANCE");// 핀번호가 맞으면(TODO**맞는지 확인 : 보안질문으로??) -> 채팅방 입장
 		btnEntrance.setBounds(558, 67, 106, 38);
 		btnEntrance.addActionListener(new ActionListener() {
@@ -110,28 +121,30 @@ public class Client extends JFrame {
 				try {
 					out.writeInt(222); // 채팅방에 들어가겠다는 신호
 					out.flush();
-					Integer roomNum = Integer.parseInt(txtPinNum.getText()); // user가 입력한 방번호 (String-->Integer)
+					roomNum = Integer.parseInt(txtPinNum.getText()); // user가 입력한 방번호 (String-->Integer)
 					out.writeObject(roomNum); // 서버에게 방번호를 보내주는 부분
 					out.flush();
-
-					chatSocket = new Socket(serverAddress, roomNum); // 소켓생성과 서버의 IP받기
-					outChat = new ObjectOutputStream(chatSocket.getOutputStream());
-					inChat = new ObjectInputStream(chatSocket.getInputStream());
-
-					// 파일 소켓 연결
-					fileSocket = new Socket(serverAddress, roomNum + 1);
-					outFile = new BufferedOutputStream(fileSocket.getOutputStream());
-					inFile = new ObjectInputStream(fileSocket.getInputStream());
-
-					// TODO 쓰레드 끝내기
-					new ChatThread().start(); // 채팅쓰레드 실행
+					
+					getQnA();
+					
+					String severQ = (String)in.readObject();
+					System.out.println(severQ);
+					System.out.println(in.readInt());
+		
+					
+					securityQnA.showingQ.append(severQ);
+					
+					
+					
+					
+					
 
 					/*
 					 * fileSocket = new Socket(serverAddress, roomNum+1); // 소켓생성과 서버의 IP받기 inFile =
 					 * new ObjectInputStream(fileSocket.getInputStream()); outFile = new
 					 * BufferedOutputStream(fileSocket.getOutputStream());
 					 */
-				} catch (IOException e) {
+				} catch (IOException | ClassNotFoundException e) {
 
 					e.printStackTrace();
 				}
@@ -146,6 +159,7 @@ public class Client extends JFrame {
 		txtPinNum.setText("Input Pin Number"); // Pin번호 입력하는 부분
 		contentPane.add(txtPinNum);
 		txtPinNum.setColumns(10);
+		
 
 		JButton btnRoom = new JButton("ROOM"); // 방 만들기 버튼
 		btnRoom.setBounds(558, 20, 79, 40);
@@ -174,14 +188,15 @@ public class Client extends JFrame {
 		textField.addActionListener(new ActionListener() { /* 문장 입력하는 부분 */
 			public void actionPerformed(ActionEvent e) {
 				try {
-					outChat.writeObject((textField.getText() + '\n'));
+					outChat.writeObject((textField.getText()) + '\n');
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 				textField.setText("");
 			}
 		});
-		txtrPn = new JTextArea();
+		
+		txtrPn = new JTextArea();      //서버한테 받은 핀번호가 보여지는 부분
 		txtrPn.setEditable(false);
 		// txtrPn.setText("Showing Pin Number");
 		txtrPn.setBounds(645, 20, 263, 38);
@@ -196,9 +211,64 @@ public class Client extends JFrame {
 	/**
 	 * Prompt for and return the desired screen name.
 	 */
+//////////////////////////////////////////////////////////////////////// 보안 질문 프레임 ////////////////////////////////////////////////////////////////////////////////
+	
+	private void getQnA() {
+		this.securityQnA = new SecurityQnA(); // 로그인창 보이기
+		//System.out.println("3");
+		this.securityQnA.setMain(this);
+		//System.out.println("2");
+		this.securityQnA.setVisible(true);
+		//System.out.println("1");
+		
+		securityQnA.QNAConf.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String enSecurityAsr = securityQnA.textAnswer.getText();
+				
+				try {
+					out.writeObject(roomNum);
+					out.flush();
+					out.writeObject(enSecurityAsr);
+					out.flush();
+				
+					valueQNA = in.readInt();
+					System.out.println(valueQNA);
+					
+					if(valueQNA == 149)
+					{
+						disposeQnA();
+						
+						chatSocket = new Socket(serverAddress, roomNum); // 소켓생성과 서버의 IP받기
+						outChat = new ObjectOutputStream(chatSocket.getOutputStream());
+						inChat = new ObjectInputStream(chatSocket.getInputStream());
 
+						// 파일 소켓 연결
+//						fileSocket = new Socket(serverAddress, roomNum + 1);
+//						outFile = new BufferedOutputStream(fileSocket.getOutputStream());
+//						inFile = new ObjectInputStream(fileSocket.getInputStream());
+
+						// TODO 쓰레드 끝내기
+						new ChatThread().start(); // 채팅쓰레드 실행
+						
+					}
+						
+					
+					
+				} catch (IOException e1) {
+					
+					e1.printStackTrace();
+				}
+			}
+			
+		});
+	
+	}
+	
+	/////////////////////////////////////////////////////////////////// 로그인창 프레임 //////////////////////////////////////////////////////////////////////////////
+	
 	private void getUserInfo() {
-		this.loginView = new LoginView(); // 로그인창 보이기
+		this.loginView = new LoginView(); 
 		this.loginView.setMain(this);
 		// this.loginView.setData(userName, emailAdd);
 		loginView.btnLogin.addActionListener(new ActionListener() {
@@ -230,22 +300,19 @@ public class Client extends JFrame {
 					else if(value == 185)
 					{
 						//잘못된 비밀번호
-						System.out.println("185");
+						System.out.println("185 : 비밀번호 불일치!");
 					}
 					else if(value == 187)
 					{
 						//존재하지 않는 이메일
-						System.out.println("187");
+						System.out.println("187 : 가입되지 않은 이메일!");
 					}
-			
-					
+	
 				} catch (IOException e1) {
 				
 					e1.printStackTrace();
 				}
 				
-
-				disposeLogin();
 			}
 		});
 
@@ -253,13 +320,14 @@ public class Client extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				getJoinInfo();
-				// System.out.println("JoinJoin");
 			}
 		});
 
 	}
-
-	private void getJoinInfo() {
+	
+////////////////////////////////////////////////////////////// 회원가입 프레임 ////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void getJoinInfo() {                           
 		this.joinView = new JoinView();
 		this.joinView.setMain(this);
 		this.joinView.setVisible(true);
@@ -272,7 +340,7 @@ public class Client extends JFrame {
 				String pw1 = joinView.Joinpass.getText();
 				String pw2 = joinView.JoinCheck.getText();
 
-				if (pw1.equals(pw2)) { // 비번 일치
+				if (pw1.equals(pw2)) { // 비밀번호 체크하는 부분(비밀번호 & 비밀번호 체크)
 					
 					try {
 						out.writeInt(170);
@@ -292,22 +360,19 @@ public class Client extends JFrame {
 						else if(value == 175)
 						{
 							//이미 존재하는 아이디
-							System.out.println("175 : 이미 존재하는 아이디");
+							System.out.println("175 : 이미 가입된 이메일");
 						}
 						else if(value == 179)
 						{
 							//버튼 다시 누르기
 							System.out.println("179 : SQL-error");
 						}
-							
-						
-						
+
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					
-				
+						
 					disposeJoin();
 					
 				} else { // 비번 불일치
@@ -319,15 +384,27 @@ public class Client extends JFrame {
 		});
 		// 확인 버튼 누르면 비번확인--> 서버에게 정보 전달 --> 확인받으면 창닫기/ 못 받으면 '에러'메시치 출력 후 재입력 받기
 	}
-
-	public void disposeLogin() {
-		loginView.dispose(); // 로그인창닫기
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public void disposeLogin() {  // 로그인창닫기
+		loginView.dispose(); 
+	}
+	
+	public void disposeJoin() {  // 회원가입 창닫기
+		joinView.dispose(); 
+	}
+	
+	public void disposeHost() {  // 방 생성을 위한 정보 입력창
+		hostView.dispose();
+	}
+	
+	public void disposeQnA() {  // 로그인창닫기
+		securityQnA.dispose(); 
 	}
 
-	public void disposeJoin() {
-		joinView.dispose(); // 회원가입 창닫기
-	}
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	// 호스트 버튼 눌렀을 시 실행될 메소드
 	private void getHostInfo() {
 		this.hostView = new HostView();
@@ -360,7 +437,7 @@ public class Client extends JFrame {
 
 					Integer PinNumber = (Integer) in.readObject();
 					String PIN = String.valueOf(PinNumber); // 방번호 저장
-					System.out.println(PIN);
+					System.out.println("받은 번호 : " + PIN);
 					txtrPn.append(PIN); // 방번호를 보여주는 부분
 
 				} catch (IOException | ClassNotFoundException e1) {
@@ -379,9 +456,6 @@ public class Client extends JFrame {
 	 * return null; }
 	 */
 
-	public void disposeHost() {
-		hostView.dispose();
-	}
 
 	private void ConnectSocket() throws IOException {
 
