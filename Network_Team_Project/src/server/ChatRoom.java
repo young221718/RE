@@ -36,7 +36,7 @@ public class ChatRoom extends Room {
 			// Create character streams for the socket.
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
-			input = (Chat) fromClient.readObject();
+			
 
 			System.out.println("Chat stream connect");
 			System.out.println("port: " + portNumber);
@@ -46,6 +46,7 @@ public class ChatRoom extends Room {
 			}
 
 			// broadcast enter
+			input = new Chat();
 			input.email = "";
 			input.name = "";
 			input.message = "========<" + db.GetUserName(email) + " enter>=========\n";
@@ -57,15 +58,18 @@ public class ChatRoom extends Room {
 			System.out.println("ChatRoom Log 1");
 
 			while (true) {
-
-				if (input == null)
+				input = (Chat)fromClient.readObject();
+//				input = ((Chat)fromClient.readObject());
+				System.out.println(input);
+				if (input == null) {
+					System.out.println("NULL");
 					return;
+				}
 
 				for (ObjectOutputStream oos : broadcaster.get(portNumber).values()) {
 					oos.writeObject(input);
 					oos.flush();
-				}
-
+				}	
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -99,6 +103,8 @@ public class ChatRoom extends Room {
 				toClient.close();
 				fromClient.close();
 				roomSocket.close();
+				
+				System.out.println("end Chat");
 			} catch (IOException e) {
 			}
 		}
