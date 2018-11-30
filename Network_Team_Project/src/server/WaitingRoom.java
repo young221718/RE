@@ -15,8 +15,10 @@ public class WaitingRoom extends Room {
 	private static HashMap<Integer, ServerSocket> chatRoomServerSockets = new HashMap<Integer, ServerSocket>();
 	//private static HashMap<Integer, RoomInformation> roomInforMap = new HashMap<Integer, RoomInformation>();
 	private static HashMap<Integer, ServerSocket> fileRoomServerSockets = new HashMap<Integer, ServerSocket>();
+	
 	private RoomInformation roomInfor;
 
+	
 	WaitingRoom(Socket socket) {
 		super(socket);
 	}
@@ -24,7 +26,7 @@ public class WaitingRoom extends Room {
 	public void run() {
 		try {
 			System.out.println("Welcome Waiting Room");
-			db = new Database();
+			
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 
@@ -85,7 +87,7 @@ public class WaitingRoom extends Room {
 					// enter the room
 					System.out.println("Enter room Pin in " + PIN);
 					System.out.println("enter chat room : " + enterChatRoom(PIN));
-					//System.out.println("enter file room : " + enterFileRoom(PIN));
+					System.out.println("enter file room : " + enterFileRoom(PIN));
 					
 
 				} else if (888 == protocol) {
@@ -132,13 +134,14 @@ public class WaitingRoom extends Room {
 
 		protocol = fromClient.readInt();
 		if (protocol == 170) { // 회원가입
-			String email = (String) fromClient.readObject();
+			email = (String) fromClient.readObject();
 			String userName = (String) fromClient.readObject();
 			String password = (String) fromClient.readObject();
 
 			System.out.println("from client: " + email + " " + userName + " " + password);
 
 			int result = db.InsertUserInfor(userName, email, password);
+			db.CommitDB();
 			if (result == 1) {
 				toClient.writeInt(171); // success
 				toClient.flush();
@@ -152,7 +155,7 @@ public class WaitingRoom extends Room {
 			System.out.println("join " + result);
 
 		} else if (protocol == 180) { // 로그인
-			String email = (String) fromClient.readObject();
+			email = (String) fromClient.readObject();
 			String password = (String) fromClient.readObject();
 
 			System.out.println("from client: " + email + " " + password);
@@ -161,7 +164,13 @@ public class WaitingRoom extends Room {
 			if (result == 1) {
 				toClient.writeInt(181); // success
 				toClient.flush();
-				db.CommitDB();
+				
+				// give to client email and name
+				toClient.writeObject(email);
+				toClient.writeObject(db.GetUserName(email));
+				toClient.flush();
+				System.out.println(email + " " + db.GetUserName(email));
+				
 				return true;
 			} else if (result == 0) {
 				toClient.writeInt(183); // sql error
@@ -223,7 +232,7 @@ public class WaitingRoom extends Room {
 			loadRoomServerSocket(PIN);
 		}
 		try {
-			new ChatRoom(chatRoomServerSockets.get(PIN).accept(),PIN).start();
+			new ChatRoom(chatRoomServerSockets.get(PIN).accept(),PIN, email).start();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -111,7 +111,31 @@ public class Database {
 		}
 		return 1; // success
 	}
-
+	
+	/**
+	 * GetUserName
+	 * get user's name from database to use email
+	 * @param email user's email
+	 * @return user's name
+	 */
+	public String GetUserName(String email) {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "select user_name from user_information where email ='" + email + "'";
+			rs = stmt.executeQuery(sql);
+			
+			if (rs.next()) {
+				return rs.getString(1); // return question
+			} else {
+				return null; // not exist room
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
 	/**
 	 * GetRoomQuetion: 방 보안질문을 받아오는 메소드
 	 * 
@@ -205,11 +229,11 @@ public class Database {
 	public String GetRoomName(int roomNum) {
 		try {
 			stmt = (Statement) con.createStatement();
-			String sql = "select group_name from room_information which group_id = " + roomNum;
+			String sql = "select group_name from room_information where group_id = " + roomNum;
 			rs = stmt.executeQuery(sql);
 
 			if (rs.next())
-				return rs.getString(0);
+				return rs.getString(1);
 
 		} catch (SQLException e) {
 			e.printStackTrace();

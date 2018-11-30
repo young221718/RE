@@ -14,8 +14,10 @@ public abstract class Room extends Thread{
    protected int portNumber;
    protected int protocol;
    protected Database db;
+   protected String email;
    
    public Room(Socket socket){
       this.roomSocket = socket;
+      db = new Database();
    }
 }
