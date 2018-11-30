@@ -11,7 +11,6 @@ public abstract class Room extends Thread{
    protected Socket roomSocket;
    protected ObjectInputStream fromClient;
    protected ObjectOutputStream toClient;
-   protected RoomInformation roomInfor;
    protected int portNumber;
    protected int protocol;
    protected Database db;
