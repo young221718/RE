@@ -369,12 +369,15 @@ public class Client extends JFrame {
 		                {
 							//프로토콜
 							System.out.println(egg.listA.get(i));
-							fileIn = new FileInputStream(egg.listA.get(i));
+							File f = new File(egg.listA.get(i));
+							int leng = (int)f.length();
+							outFile.write(leng);
+							fileIn = new FileInputStream(f);
 							System.out.println(egg.listA.get(0));
 							System.out.println(egg.listA.get(1));
 							 byte[] buffer = new byte[8192];
 			                 int bytesRead =0;
-			                 while ((bytesRead = fileIn.read(buffer)) > 0) {
+			                 while ((bytesRead = fileIn.read(buffer)) > 0 && (bytesRead <= leng)) {
 			                     outFile.write(buffer, 0, bytesRead);
 			                     //bytesRead 파일사이즈로 잡기
 			                 }
