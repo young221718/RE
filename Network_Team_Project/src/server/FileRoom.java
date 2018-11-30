@@ -1,66 +1,74 @@
 package server;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 import basic.Room;
+import basic.RoomInformation;
 
 public class FileRoom extends Room {
 
+	//FileOutputStream out;
 	int cnt=0;
 	public FileRoom(Socket socket) {
 		super(socket);
 	}
+
 	public FileRoom(Socket socket, int port) {
 		super(socket);
 		this.portNumber = port;
 	}
 
-	
-
 	public void run() {
+		int a =0;
 		System.out.println("Enter the FileRoom!");
 		try {
-
-			ObjectOutputStream toCleint = new ObjectOutputStream(roomSocket.getOutputStream());
+			//ObjectOutputStream toCleint = new ObjectOutputStream(roomSocket.getOutputStream());
+				BufferedInputStream up = new BufferedInputStream(roomSocket.getInputStream());
+				DataInputStream fromClient = new DataInputStream(up);
+			
 			String imageName = "익스샌프란01";
 			// toClient.writeObject(imageName);
 			System.out.println("file name: " + imageName);
 
-			InputStream in = roomSocket.getInputStream();
+			//InputStream in = roomSocket.getInputStream();
+			//DataInputStream in = roomSocket.getInputStream();
+			int sign = 0;
 			
-			int fPro = in.read(); // 프로토콜 
-			
-			
+
 			String group_name = db.GetRoomName(portNumber);
-					
+			
+			do {
+			int fPro = up.read(); // 프로토콜 
 			
 			if (fPro == 77) {
-				//루프할 숫자 받기
-				int count = in.read();
-				for(int i=0;i<count;i++)
-				{
-				System.out.println("roof\n");
-				File f = new File("C:\\RE\\" + group_name); // folderNN - 폴더, groupNB - group_id
-				if (f.exists() == false)
-					f.mkdirs();
-				FileOutputStream out = new FileOutputStream(f + "\\us" +cnt +".png");
-
-				byte[] buffer = new byte[8192];
-				int bytesRead = 0;
-				while ((bytesRead = in.read(buffer)) > 0) {
-					out.write(buffer, 0, bytesRead);
-
+				int len = fromClient.readInt();
+				System.out.println(len + " received");
+				File f = new File("C:\\RE\\" + group_name);
+				if (f.exists() == false) 
+					f.mkdirs();// folderNN - 폴더, groupNB - group_id
+				
+				FileOutputStream toFile = new FileOutputStream(f +"\\" + a + ".png");
+				BufferedOutputStream outFile = new BufferedOutputStream(toFile);
+				int ch =0;
+				
+				for(int i=0; i<len; i++) {
+					outFile.write(up.read());
 				}
-				cnt++;
-				out.flush();
-				//out.close();
-				}
-			}
+				sign = fromClient.read();
+				a++;
+				outFile.flush();
+				outFile.close();} }while(sign != 99);
+				
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {

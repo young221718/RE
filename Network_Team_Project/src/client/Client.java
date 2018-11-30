@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import java.io.DataOutputStream;
 
 import basic.RoomInformation;
 import client.JoinView;
@@ -41,11 +43,13 @@ public class Client extends JFrame {
 	ObjectOutputStream outChat;
 	Socket chatSocket; // chattingRomm socket
 
-	BufferedOutputStream outFile;
+	BufferedOutputStream toServer;
 	ObjectInputStream inFile;
-	Socket fileSocket; // fileRoom socket
-	FileInputStream fileIn;
-
+	Socket fileSocket;  //fileRoom socket
+	FileInputStream fis;
+	BufferedInputStream bis;
+	DataOutputStream dos;
+	
 	Integer roomNum;
 	int valueQNA;
 	
@@ -107,8 +111,8 @@ public class Client extends JFrame {
 		contentPane.add(btnSending);
 		btnSending.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-
-				new FileThread().start();
+				
+				run();
 
 			}
 
@@ -244,9 +248,9 @@ public class Client extends JFrame {
 						inChat = new ObjectInputStream(chatSocket.getInputStream());
 
 						// 파일 소켓 연결
-//						fileSocket = new Socket(serverAddress, roomNum + 1);
-//						outFile = new BufferedOutputStream(fileSocket.getOutputStream());
-//						inFile = new ObjectInputStream(fileSocket.getInputStream());
+						fileSocket = new Socket(serverAddress, roomNum + 1);
+						toServer = new BufferedOutputStream(fileSocket.getOutputStream());
+						dos = new DataOutputStream(fileSocket.getOutputStream());
 
 						// TODO 쓰레드 끝내기
 						new ChatThread().start(); // 채팅쓰레드 실행
@@ -516,32 +520,35 @@ public class Client extends JFrame {
 		}
 	}
 
-	public class FileThread extends Thread {
+//	public class FileThread extends Thread {
 		public void run() {
-
+			int sign = 66;
 			try {
-				outFile.write(77);
-				outFile.flush();
-				outFile.write(egg.listA.size());
-				for (int i = 0; i < egg.listA.size(); i++) {
-					// 프로토콜
-					System.out.println(egg.listA.get(i));
-					fileIn = new FileInputStream(egg.listA.get(i));
-					System.out.println(egg.listA.get(0));
-					System.out.println(egg.listA.get(1));
-					byte[] buffer = new byte[8192];
-					int bytesRead = 0;
-					while ((bytesRead = fileIn.read(buffer)) > 0) {
-						outFile.write(buffer, 0, bytesRead);
-						// bytesRead 파일사이즈로 잡기
-					}
-					System.out.println("end\n");
-					outFile.flush();
-
-				}
-				outFile.close();
-				fileIn.close();
-
+				for(int i=0; i<egg.listA.size(); i++)
+				 {
+				   toServer.write(77);
+				   toServer.flush();
+				
+					//프로토콜
+				   System.out.println(egg.listA.get(i));
+				   File f = new File(egg.listA.get(i));
+				   fis = new FileInputStream(f);
+				   bis = new BufferedInputStream(fis);
+				   System.out.println(f.length() + "rec");
+				   dos.writeInt(bis.available());
+				   int ch =0;
+					
+				   while ((ch = bis.read()) != -1 ) {
+					   toServer.write(ch);
+	               }
+	               System.out.println("end\n");
+	               toServer.flush();
+	               
+	               if(i==egg.listA.size()-1)
+	            	   sign=99;
+	               dos.write(sign);       
+                }
+				fis.close();
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -551,5 +558,5 @@ public class Client extends JFrame {
 
 		}
 
-	}
+	//}
 }
