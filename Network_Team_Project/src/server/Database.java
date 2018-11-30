@@ -20,19 +20,20 @@ public class Database {
 	Statement stmt = null;
 	ResultSet rs = null;
 
-//	public static void main(String[] args) {
-//		Database redb = new Database();
-//
-//		System.out.println(redb.InsertUserInfor("ChanYoung", "young221718@gmail.com", "1234"));
-//		System.out.println(redb.CheckPassword("young221718@gmail.com", "1234"));
-//
-//		// try {
-//		// //redb.con.commit();
-//		// } catch (SQLException e) {
-//		// // TODO Auto-generated catch block
-//		// e.printStackTrace();
-//		// }
-//	}
+	// public static void main(String[] args) {
+	// Database redb = new Database();
+	//
+	// System.out.println(redb.InsertUserInfor("ChanYoung", "young221718@gmail.com",
+	// "1234"));
+	// System.out.println(redb.CheckPassword("young221718@gmail.com", "1234"));
+	//
+	// // try {
+	// // //redb.con.commit();
+	// // } catch (SQLException e) {
+	// // // TODO Auto-generated catch block
+	// // e.printStackTrace();
+	// // }
+	// }
 
 	/**
 	 * constructor
@@ -45,7 +46,7 @@ public class Database {
 				String userPSQL = "insert into user_information(user_name,email,password) values(?, ?, ?);";
 				userPS = (PreparedStatement) con.prepareStatement(userPSQL);
 
-				String roomPSQL = "insert into room_informtaion values(?,?,?,?,?,?,?);";
+				String roomPSQL = "insert into room_information values(?,?,?,?,?,?,?);";
 				roomPS = (PreparedStatement) con.prepareStatement(roomPSQL);
 			}
 		} catch (SQLException e) {
@@ -62,7 +63,7 @@ public class Database {
 			String url = "jdbc:mysql://localhost/re_db";
 			String user = "root", passwd = "12345";
 			con = (Connection) DriverManager.getConnection(url, user, passwd);
-			
+
 			System.out.println(con);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -110,47 +111,134 @@ public class Database {
 		}
 		return 1; // success
 	}
-	
+
 	/**
 	 * GetRoomQuetion: 방 보안질문을 받아오는 메소드
-	 * @param roomNum 방 번호
+	 * 
+	 * @param roomNum
+	 *            방 번호
 	 * @return String 방 번호에 해당하는 질문이다.
 	 */
 	public String GetRoomQuestion(int roomNum) {
 		try {
 			stmt = (Statement) con.createStatement();
 			String sql = "select question from room_information where group_id =" + roomNum;
+			rs = stmt.executeQuery(sql);
 			
 			if (rs.next()) {
-				return rs.getString(0); // return question
+				return rs.getString(1); // return question
 			} else {
 				return null; // not exist room
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return null;		
+		return null;
 	}
-	
+
 	/**
 	 * CheckRoomAnswer
-	 * @param String an user's answer
-	 * @return int return 1 if success, return -1 if fail, return -2 if sql error
+	 * 
+	 * @param String
+	 *            an user's answer
+	 * @return return 1 if success, return -1 if fail, return -2 if sql error
 	 */
 	public int CheckRoomAnswer(String an, int roomNum) {
 		try {
 			stmt = (Statement) con.createStatement();
 			String sql = "select * from room_information where answer ='" + an + "' and group_id =" + roomNum;
 			rs = stmt.executeQuery(sql);
-			
-			if(rs.next()) return 1; // success
-			else return -1; // fail
-		} catch(SQLException e) {
+
+			if (rs.next())
+				return 1; // success
+			else
+				return -1; // fail
+		} catch (SQLException e) {
 			return -2; // sql error
 		}
 	}
-
 	
+	/**
+	 * UpdateRoomNumber
+	 * update room number add two 
+	 * @return success return 1, else 0 or -1
+	 */
+	public int UpdateRoomNumber() {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "update room_number set number = number + 2";
+			return stmt.executeUpdate(sql);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	/**
+	 * GetRoomNumber
+	 * get room number from database
+	 * @return if success return PIN, else return 01;
+	 */
+	public int GetRoomNumber() {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "select number from room_number";
+			rs = stmt.executeQuery(sql);
+
+			if (rs.next())
+				return rs.getInt(1);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	/**
+	 * GetRoomName
+	 * 
+	 * @param roomNum
+	 *            pin number
+	 * @return room name (group name)
+	 */
+	public String GetRoomName(int roomNum) {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "select group_name from room_information which group_id = " + roomNum;
+			rs = stmt.executeQuery(sql);
+
+			if (rs.next())
+				return rs.getString(0);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * CheckRoomExist check if room is already exist in database
+	 * 
+	 * @param roomNum
+	 *            room number which want to check
+	 * @return if exist return true, else return false
+	 */
+	public boolean CheckRoomExist(int roomNum) {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "select * from room_information where group_id =" + roomNum;
+			rs = stmt.executeQuery(sql);
+
+			if (!rs.next())
+				return false; // not exist
+
+		} catch (SQLException e) {
+
+		}
+		return true;
+	}
+
 	/**
 	 * CheckPassword - 로그인을 하기 위한 메서드
 	 * 
@@ -232,16 +320,16 @@ public class Database {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * CommitDB : 데이터베이스를 커밋한다.
 	 */
 	public void CommitDB() {
 		try {
-			
-				con.commit();
-			
-		} catch(SQLException e) {
+
+			con.commit();
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}

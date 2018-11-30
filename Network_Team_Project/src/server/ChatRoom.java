@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import basic.Room;
-import basic.RoomInformation;
 
 
 
@@ -18,15 +17,17 @@ public class ChatRoom extends Room{
 	public ChatRoom(Socket socket) {
 		super(socket);
 	}
-	public ChatRoom(Socket socket, RoomInformation rf) {
+	
+	public ChatRoom(Socket socket, int port) {
 		super(socket);
-		this.roomInfor = rf;
-		this.portNumber = this.roomInfor.port;
-		if(!broadcaster.containsKey(portNumber)) {
-			broadcaster.put(portNumber, new HashSet<ObjectOutputStream>());
+		this.portNumber = port;
+		synchronized (broadcaster) {
+			if(!broadcaster.containsKey(portNumber)) {
+				broadcaster.put(portNumber, new HashSet<ObjectOutputStream>());
+			}
 		}
-		
 	}
+	
 	
 	public void run(){
 		System.out.println("Enter chat room");
@@ -36,12 +37,8 @@ public class ChatRoom extends Room{
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			
-//			for(int i=0;i<10;i++) {
-//				String tstr = (String)fromClient.readObject();
-//				System.out.println(tstr);
-//				String message = "RE: " +tstr;
-//				toClient.writeObject(message);
-//			}
+			System.out.println("Chat stream connect");
+			System.out.println("port: " + portNumber);
 			
 			synchronized (broadcaster) {
 				broadcaster.get(portNumber).add(toClient);

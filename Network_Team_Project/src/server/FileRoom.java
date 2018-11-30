@@ -1,18 +1,13 @@
 package server;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 
 import basic.Room;
-import basic.RoomInformation;
 
 public class FileRoom extends Room {
 
@@ -20,11 +15,12 @@ public class FileRoom extends Room {
 	public FileRoom(Socket socket) {
 		super(socket);
 	}
-
-	public FileRoom(Socket socket, RoomInformation rf) {
+	public FileRoom(Socket socket, int port) {
 		super(socket);
-		this.roomInfor = rf;
+		this.portNumber = port;
 	}
+
+	
 
 	public void run() {
 		System.out.println("Enter the FileRoom!");
@@ -39,8 +35,9 @@ public class FileRoom extends Room {
 			
 			int fPro = in.read(); // 프로토콜 
 			
-
-			String group_name = roomInfor.groupName;
+			
+			String group_name = db.GetRoomName(portNumber);
+					
 			
 			if (fPro == 77) {
 				//루프할 숫자 받기

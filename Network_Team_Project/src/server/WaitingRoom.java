@@ -12,11 +12,10 @@ import basic.RoomInformation;
 
 public class WaitingRoom extends Room {
 
-	public static HashMap<Integer, ServerSocket> chatRoomServerSockets = new HashMap<Integer, ServerSocket>();
-	public static HashMap<Integer, RoomInformation> roomInforMap = new HashMap<Integer, RoomInformation>();
-	public static HashMap<Integer, ServerSocket> fileRoomServerSockets = new HashMap<Integer, ServerSocket>();
-
-	private static Integer ROOMPIN = new Integer(10000);
+	private static HashMap<Integer, ServerSocket> chatRoomServerSockets = new HashMap<Integer, ServerSocket>();
+	//private static HashMap<Integer, RoomInformation> roomInforMap = new HashMap<Integer, RoomInformation>();
+	private static HashMap<Integer, ServerSocket> fileRoomServerSockets = new HashMap<Integer, ServerSocket>();
+	private RoomInformation roomInfor;
 
 	WaitingRoom(Socket socket) {
 		super(socket);
@@ -30,14 +29,12 @@ public class WaitingRoom extends Room {
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 
 			// loop until login success
-			while (!LogIn())
-				;
+			while (!LogIn()) {}
 			System.out.println("Success LogIn");
 
 			// 사용자가 waiting room에서 하는 일을 확인
 			// 소켓이 연결되어 있을 때까지 유지된다.
 			while (roomSocket.isConnected()) {
-
 				protocol = (Integer) fromClient.readInt();
 				System.out.println("protocol: " + protocol);
 				// protocol
@@ -53,37 +50,43 @@ public class WaitingRoom extends Room {
 					// 방 만들기를 요청한 클라이언트에게 핀번호를 전송해준다.
 					try {
 						System.out.println("Enter protocol 111");
-						int roomNumber = makeChatRoom();
-						makeFileRoom(roomNumber + 1);
+						int roomNumber = makeRoom();
+						// makeFileRoom(roomNumber + 1);
 
 						toClient.writeObject(roomNumber);
 						toClient.flush();
 						System.out.println(roomNumber + " room made");
 
 					} catch (Exception e) {
-						// TODO : 오류 프로토콜 처리해야한다!!!!!!
-						toClient.writeBytes("ERROR: FAILED MAKING ROOM");
-						toClient.writeBytes("ERROR: FAILED MAKING FileROOM");
 						e.printStackTrace();
 					}
 					System.out.println("End Protocol 111");
 
 				} else if (222 == protocol) { // Enter the room
 					System.out.println("Enter protocol 222");
-					
+
 					// send room's question
 					int PIN = (Integer) fromClient.readObject();
-					toClient.writeObject(db.GetRoomQuestion(PIN));
-					
+					String q = db.GetRoomQuestion(PIN);
+					toClient.writeObject(q);
+					toClient.flush();
+					System.out.println("pin: " + PIN +"Question: " + q);
+					toClient.writeInt(8);
+					toClient.flush();
+
 					// check room's answer is correct
 					PIN = (Integer) fromClient.readObject();
-					String an = (String)fromClient.readObject();
-					toClient.writeInt(db.CheckRoomAnswer(an, PIN));
+					String an = (String) fromClient.readObject();
+					int ck = db.CheckRoomAnswer(an, PIN);
+					if(ck == 1) toClient.writeInt(149);
+					else toClient.writeInt(151);
+					toClient.flush();
 					
 					// enter the room
 					System.out.println("Enter room Pin in " + PIN);
-					enterChatRoom(PIN);
-					enterFileRoom(PIN + 1);
+					System.out.println("enter chat room : " + enterChatRoom(PIN));
+					//System.out.println("enter file room : " + enterFileRoom(PIN));
+					
 
 				} else if (888 == protocol) {
 					toClient.close();
@@ -109,8 +112,9 @@ public class WaitingRoom extends Room {
 				if (!roomSocket.isClosed())
 					roomSocket.close();
 			} catch (IOException e) {
-
+				e.printStackTrace();
 			}
+			db.DisconnectDB();
 		}
 
 		System.out.println("End Watiing Room");
@@ -180,33 +184,26 @@ public class WaitingRoom extends Room {
 	// For ChatRoom
 	// ============================================================================================
 	/**
-	 * makeChatRoom
+	 * makeRoom
 	 * 
-	 * 이 함수는 사용자가 방 만들기 버튼을 누르고, 올바른 옵션을 입력한 후 채팅방의 서버소켓을 할당하는 함수 이다. 유니크한 핀번호를 가지게
-	 * 될때 까지 핀 번호를 할당을 시도한다.
+	 * Make unique room number which called 'PIN'. PIN is odd number because it
+	 * means port number. Insert to room information in database.
 	 * 
-	 * @return : 채팅방의 PIN 번호를 리턴해준다. (채팅방의 PIN 번호는 홀수이다.)
+	 * @return : return PIN if success make room, else return -1 if fail to make
+	 *         room.
 	 */
-	private int makeChatRoom() throws Exception {
+	private int makeRoom() throws Exception {
 		int PIN;
-		System.out.println("Enter makeChatRoom");
-		synchronized (chatRoomServerSockets) {
-			PIN = makePIN();
-			if (chatRoomServerSockets.containsKey((Integer) PIN)) {
-				System.out.println("Already Exist - ChatRoom:" + PIN);
-			}
-			synchronized (db) {
-				roomInfor.port = PIN;
-				db.InsertRoomInfor(roomInfor);
-			}
-			synchronized (roomInforMap) {
-				roomInforMap.put(PIN, roomInfor);
-			}
-			ServerSocket tempSS = new ServerSocket(PIN);
+		PIN = makePIN();
+
+		synchronized (db) {
 			roomInfor.port = PIN;
-			chatRoomServerSockets.put(PIN, tempSS);
+			// Check if room is already exist
+			if (db.CheckRoomExist(PIN))
+				return -1; // already exist
+			db.InsertRoomInfor(roomInfor); // not exist
+			db.CommitDB();
 		}
-		System.out.println("end makeChatRoom");
 		return PIN;
 	}
 
@@ -221,43 +218,38 @@ public class WaitingRoom extends Room {
 	 * @return 오류 없이 방에 들어갔으면 true를 리턴해준다.
 	 */
 	private boolean enterChatRoom(int PIN) {
-		if (chatRoomServerSockets.containsKey(PIN)) {
-			try {
-				new ChatRoom(chatRoomServerSockets.get(PIN).accept(), roomInforMap.get(PIN)).start();
 
-				System.out.println("Method enterChatroom successed");
-				return true;
-			} catch (Exception e) {
-				System.out.println("Error in enterChatroom");
-			}
+		if (!chatRoomServerSockets.containsKey(PIN)) {
+			loadRoomServerSocket(PIN);
 		}
+		try {
+			new ChatRoom(chatRoomServerSockets.get(PIN).accept(),PIN).start();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return false;
 	}
-	// End ChatRoom
-	// Method=======================================================================================
 
-	// 파일룸
 	/**
-	 * makeFileRoom
-	 * 
-	 * 이 함수는 사용자가 방 만들기 버튼을 누르고, 올바른 옵션을 입력한 후 채팅방의 서버소켓을 할당하는 함수 이다. 유니크한 핀번호를 가지게
-	 * 될때 까지 핀 번호를 할당을 시도한다.
-	 * 
-	 * @return : 파일룸의 PIN 번호를 리턴해준다. (채팅방의 PIN 번호는 짝수이다.)
+	 * // * makeFileRoom // * // * 이 함수는 사용자가 방 만들기 버튼을 누르고, 올바른 옵션을 입력한 후 채팅방의
+	 * 서버소켓을 할당하는 함수 이다. 유니크한 핀번호를 가지게 // * 될때 까지 핀 번호를 할당을 시도한다. // * // * @return
+	 * : 파일룸의 PIN 번호를 리턴해준다. (채팅방의 PIN 번호는 짝수이다.) //
 	 */
-	private void makeFileRoom(int fileRM) throws Exception {
-		System.out.println("Enter makeFileRoom");
-		synchronized (fileRoomServerSockets) {
-
-			if (fileRoomServerSockets.containsKey((Integer) fileRM)) {
-				System.out.println("eeeeeeaaaaak - file");
-			}
-			ServerSocket tempSV = new ServerSocket(fileRM);
-
-			fileRoomServerSockets.put(fileRM, tempSV);
-		}
-		System.out.println("end makeFileRoom");
-	}
+	// private void makeFileRoom(int fileRM) {
+	// System.out.println("Enter makeFileRoom");
+	// synchronized (fileRoomServerSockets) {
+	//
+	// if (fileRoomServerSockets.containsKey((Integer) fileRM)) {
+	// System.out.println("eeeeeeaaaaak - file");
+	// }
+	// ServerSocket tempSV = new ServerSocket(fileRM);
+	//
+	// fileRoomServerSockets.put(fileRM, tempSV);
+	// }
+	// System.out.println("end makeFileRoom");
+	// }
 
 	/**
 	 * enterFileRoom
@@ -269,17 +261,15 @@ public class WaitingRoom extends Room {
 	 *            - 들어가고 싶은 채팅방의 핀번호
 	 * @return 오류 없이 방에 들어갔으면 true를 리턴해준다.
 	 */
-	private static boolean enterFileRoom(int PIN) {
+	private boolean enterFileRoom(int PIN) {
 		if (fileRoomServerSockets.containsKey(PIN)) {
 			try {
-				new FileRoom(fileRoomServerSockets.get(PIN).accept(), roomInforMap.get(PIN - 1)).start();
-				System.out.println("enterFileroom very good");
+				new FileRoom(fileRoomServerSockets.get(PIN).accept(), PIN).start();
 				return true;
 			} catch (Exception e) {
-				System.out.println("Error in enterFileroom");
+				e.printStackTrace();
 			}
 		}
-		System.out.println("FFFFFFFFFF - file");
 		return false;
 	}
 
@@ -290,15 +280,40 @@ public class WaitingRoom extends Room {
 	 * 
 	 * @return 10000 이상을 리턴함
 	 */
-	private static int makePIN() {
+	private int makePIN() {
 		int PIN;
 
-		synchronized (ROOMPIN) {
-			PIN = ROOMPIN;
-			ROOMPIN += 2;
+		synchronized (db) {
+			PIN = db.GetRoomNumber();
+			System.out.println(PIN);
+			db.UpdateRoomNumber();
+			db.CommitDB();
 		}
-		System.out.println("End makePin");
 		return PIN;
 	}
 
+	/**
+	 * loadRoomServerSocket load memory from database
+	 * 
+	 * @param roomNum
+	 *            room Number
+	 * @return if success return true else return false
+	 */
+	private boolean loadRoomServerSocket(int roomNum) {
+		try {
+			synchronized (chatRoomServerSockets) {
+				if (!chatRoomServerSockets.containsKey(roomNum)) {
+					chatRoomServerSockets.put(roomNum, new ServerSocket(roomNum));
+				}
+			}
+			synchronized (fileRoomServerSockets) {
+				if (!fileRoomServerSockets.containsKey(roomNum)) {
+					fileRoomServerSockets.put(roomNum, new ServerSocket(roomNum + 1));
+				}
+			}
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
 }
