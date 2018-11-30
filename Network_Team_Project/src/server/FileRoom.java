@@ -48,7 +48,6 @@ public class FileRoom extends Room {
 				for(int i=0;i<count;i++)
 				{
 				System.out.println("roof\n");
-				int size = in.read();
 				File f = new File("C:\\RE\\" + group_name); // folderNN - Æú´õ, groupNB - group_id
 				if (f.exists() == false)
 					f.mkdirs();
@@ -56,7 +55,7 @@ public class FileRoom extends Room {
 
 				byte[] buffer = new byte[8192];
 				int bytesRead = 0;
-				while ((bytesRead = in.read(buffer)) > 0 && (bytesRead <=  size)) {
+				while ((bytesRead = in.read(buffer)) > 0) {
 					out.write(buffer, 0, bytesRead);
 
 				}
