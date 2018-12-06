@@ -13,12 +13,12 @@ import basic.RoomInformation;
 public class WaitingRoom extends Room {
 
 	private static HashMap<Integer, ServerSocket> chatRoomServerSockets = new HashMap<Integer, ServerSocket>();
-	//private static HashMap<Integer, RoomInformation> roomInforMap = new HashMap<Integer, RoomInformation>();
+	// private static HashMap<Integer, RoomInformation> roomInforMap = new
+	// HashMap<Integer, RoomInformation>();
 	private static HashMap<Integer, ServerSocket> fileRoomServerSockets = new HashMap<Integer, ServerSocket>();
-	
+
 	private RoomInformation roomInfor;
 
-	
 	WaitingRoom(Socket socket) {
 		super(socket);
 	}
@@ -26,12 +26,13 @@ public class WaitingRoom extends Room {
 	public void run() {
 		try {
 			System.out.println("Welcome Waiting Room");
-			
+
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 
 			// loop until login success
-			while (!LogIn()) {}
+			while (!LogIn()) {
+			}
 			System.out.println("Success LogIn");
 
 			// 사용자가 waiting room에서 하는 일을 확인
@@ -67,28 +68,44 @@ public class WaitingRoom extends Room {
 				} else if (222 == protocol) { // Enter the room
 					System.out.println("Enter protocol 222");
 
-					// send room's question
 					int PIN = (Integer) fromClient.readObject();
-					String q = db.GetRoomQuestion(PIN);
-					toClient.writeObject(q);
-					toClient.flush();
-					System.out.println("pin: " + PIN +"Question: " + q);
-					toClient.writeInt(8);
-					toClient.flush();
+					
+					
+					if (db.IsAlreadyUser(PIN, email) || db.IsPossibleEnterRoom(PIN)) {
+						System.out.println("Possible");
+						
+						// send room's question
+						String q = db.GetRoomQuestion(PIN);
+						toClient.writeObject(q);
+						toClient.flush();
+						System.out.println("pin: " + PIN + "Question: " + q);
+						toClient.writeInt(8);
+						toClient.flush();
 
-					// check room's answer is correct
-					PIN = (Integer) fromClient.readObject();
-					String an = (String) fromClient.readObject();
-					int ck = db.CheckRoomAnswer(an, PIN);
-					if(ck == 1) toClient.writeInt(149);
-					else toClient.writeInt(151);
-					toClient.flush();
-					
-					// enter the room
-					System.out.println("Enter room Pin in " + PIN);
-					System.out.println("enter chat room : " + enterChatRoom(PIN));
-					System.out.println("enter file room : " + enterFileRoom(PIN));
-					
+						// check room's answer is correct
+						PIN = (Integer) fromClient.readObject();
+						String an = (String) fromClient.readObject();
+						int ck = db.CheckRoomAnswer(an, PIN);
+						if (ck == 1)
+							toClient.writeInt(149);
+						else
+							toClient.writeInt(151);
+						toClient.flush();
+
+						// TODO: update room information current people
+						int temp = db.InsertRoomUser(PIN, email);
+						if(temp == 1) db.UpdateCurPeople(PIN);
+						System.out.println("temp = " + temp);
+						db.CommitDB();
+
+						// enter the room
+						System.out.println("Enter room Pin in " + PIN);
+						System.out.println("enter chat room : " + enterChatRoom(PIN));
+						System.out.println("enter file room : " + enterFileRoom(PIN));
+					} else {
+						// TODO: 들어가지 못하다고 알리는 프로토콜
+						System.out.println("Not Possible");
+					}
 
 				} else if (888 == protocol) {
 					toClient.close();
@@ -164,13 +181,13 @@ public class WaitingRoom extends Room {
 			if (result == 1) {
 				toClient.writeInt(181); // success
 				toClient.flush();
-				
+
 				// give to client email and name
 				toClient.writeObject(email);
 				toClient.writeObject(db.GetUserName(email));
 				toClient.flush();
 				System.out.println(email + " " + db.GetUserName(email));
-				
+
 				return true;
 			} else if (result == 0) {
 				toClient.writeInt(183); // sql error
@@ -229,10 +246,10 @@ public class WaitingRoom extends Room {
 	private boolean enterChatRoom(int PIN) {
 
 		if (!chatRoomServerSockets.containsKey(PIN)) {
-			loadRoomServerSocket(PIN);
+			loadChatRoomServerSocket(PIN);
 		}
 		try {
-			new ChatRoom(chatRoomServerSockets.get(PIN).accept(),PIN, email).start();
+			new ChatRoom(chatRoomServerSockets.get(PIN).accept(), PIN, email).start();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -271,14 +288,17 @@ public class WaitingRoom extends Room {
 	 * @return 오류 없이 방에 들어갔으면 true를 리턴해준다.
 	 */
 	private boolean enterFileRoom(int PIN) {
-		if (fileRoomServerSockets.containsKey(PIN)) {
-			try {
-				new FileRoom(fileRoomServerSockets.get(PIN).accept(), PIN).start();
-				return true;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		if (!fileRoomServerSockets.containsKey(PIN)) {
+			loadFileRoomServerSocket(PIN);
 		}
+		try {
+			// new FileRoom(fileRoomServerSockets.get(PIN).accept(), PIN).start();
+			new FileSender(fileRoomServerSockets.get(PIN).accept(), PIN).start();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return false;
 	}
 
@@ -302,19 +322,34 @@ public class WaitingRoom extends Room {
 	}
 
 	/**
-	 * loadRoomServerSocket load memory from database
+	 * loadChatRoomServerSocket load memory from database
 	 * 
 	 * @param roomNum
 	 *            room Number
 	 * @return if success return true else return false
 	 */
-	private boolean loadRoomServerSocket(int roomNum) {
+	private boolean loadChatRoomServerSocket(int roomNum) {
 		try {
 			synchronized (chatRoomServerSockets) {
 				if (!chatRoomServerSockets.containsKey(roomNum)) {
 					chatRoomServerSockets.put(roomNum, new ServerSocket(roomNum));
 				}
 			}
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * loadFileRoomServerSocket load memory from database
+	 * 
+	 * @param roomNum
+	 *            room Number
+	 * @return if success return true else return false
+	 */
+	private boolean loadFileRoomServerSocket(int roomNum) {
+		try {
 			synchronized (fileRoomServerSockets) {
 				if (!fileRoomServerSockets.containsKey(roomNum)) {
 					fileRoomServerSockets.put(roomNum, new ServerSocket(roomNum + 1));

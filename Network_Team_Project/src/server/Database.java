@@ -111,11 +111,12 @@ public class Database {
 		}
 		return 1; // success
 	}
-	
+
 	/**
-	 * GetUserName
-	 * get user's name from database to use email
-	 * @param email user's email
+	 * GetUserName get user's name from database to use email
+	 * 
+	 * @param email
+	 *            user's email
 	 * @return user's name
 	 */
 	public String GetUserName(String email) {
@@ -123,7 +124,7 @@ public class Database {
 			stmt = (Statement) con.createStatement();
 			String sql = "select user_name from user_information where email ='" + email + "'";
 			rs = stmt.executeQuery(sql);
-			
+
 			if (rs.next()) {
 				return rs.getString(1); // return question
 			} else {
@@ -134,8 +135,7 @@ public class Database {
 		}
 		return null;
 	}
-	
-	
+
 	/**
 	 * GetRoomQuetion: 방 보안질문을 받아오는 메소드
 	 * 
@@ -148,7 +148,7 @@ public class Database {
 			stmt = (Statement) con.createStatement();
 			String sql = "select question from room_information where group_id =" + roomNum;
 			rs = stmt.executeQuery(sql);
-			
+
 			if (rs.next()) {
 				return rs.getString(1); // return question
 			} else {
@@ -181,10 +181,99 @@ public class Database {
 			return -2; // sql error
 		}
 	}
+
+	/**
+	 * 
+	 * @param roomNumber
+	 * @param email
+	 * @return if success return 1, already exist return -1, else return 0
+	 */
+	public int InsertRoomUser(int roomNumber, String email) {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "insert into room_user values('" + email + "'," + roomNumber + ")";
+			int cnt = stmt.executeUpdate(sql);
+
+			if (cnt == -1) {
+				return -1;
+			} else if (cnt == 1) {
+				return 1;
+			}
+
+		} catch (SQLException e) {
+
+		}
+		return 0;
+	}
+
+	/**
+	 * 
+	 * @param roomNumber
+	 * @return success return 1, else return -1
+	 */
+	public int UpdateCurPeople(int roomNumber) {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "update room_information set cur_people = cur_people + 1 where group_id = " + roomNumber;
+			int cnt = stmt.executeUpdate(sql);
+
+			if (cnt == 1)
+				return 1;
+		} catch (Exception e) {
+
+		}
+		return -1;
+	}
+
+	/**
+	 * 
+	 * @param roomNumber
+	 * @return if possible return true, else return false
+	 */
+	public boolean IsPossibleEnterRoom(int roomNumber) {
+		try {
+			System.out.println("test2");
+			stmt = (Statement) con.createStatement();
+			String sql = "select cur_people, max_people from room_information where group_id =" + roomNumber;
+			rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				if (Integer.parseInt(rs.getString(1)) < Integer.parseInt(rs.getString(2)))
+					return true;
+			}
+		} catch (Exception e) {
+
+		}
+		return false;
+	}
 	
 	/**
-	 * UpdateRoomNumber
-	 * update room number add two 
+	 * 
+	 * @param roomNumber
+	 * @param email
+	 * @return yes return true else return false
+	 */
+	public boolean IsAlreadyUser(int roomNumber, String email) {
+		try {
+			System.out.println("for test");
+			stmt = (Statement) con.createStatement();
+			String sql = "select * from room_user where group_id = " + roomNumber + " and email = '" + email + "'";
+			System.out.println(sql);
+			rs = stmt.executeQuery(sql);
+			
+			boolean temp = rs.next();
+			System.out.println("is already user?: "+temp);
+			return temp;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * UpdateRoomNumber update room number add two
+	 * 
 	 * @return success return 1, else 0 or -1
 	 */
 	public int UpdateRoomNumber() {
@@ -192,16 +281,16 @@ public class Database {
 			stmt = (Statement) con.createStatement();
 			String sql = "update room_number set number = number + 2";
 			return stmt.executeUpdate(sql);
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return -1;
 	}
-	
+
 	/**
-	 * GetRoomNumber
-	 * get room number from database
+	 * GetRoomNumber get room number from database
+	 * 
 	 * @return if success return PIN, else return 01;
 	 */
 	public int GetRoomNumber() {
@@ -212,13 +301,13 @@ public class Database {
 
 			if (rs.next())
 				return rs.getInt(1);
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * GetRoomName
 	 * 
@@ -240,7 +329,7 @@ public class Database {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * CheckRoomExist check if room is already exist in database
 	 * 
