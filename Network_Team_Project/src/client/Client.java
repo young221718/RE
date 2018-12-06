@@ -37,9 +37,9 @@ public class Client extends JFrame {
 	ObjectInputStream in;
 	ObjectOutputStream out;
 	Socket socket; // waitingRoom socket
-
+	ImageView imageView;
 	// String serverAddress = getServerAddress();
-	String serverAddress = "192.9.11.113";
+	String serverAddress = "172.16.34.151";
 
 	ObjectInputStream inChat;
 	ObjectOutputStream outChat;
@@ -81,6 +81,7 @@ public class Client extends JFrame {
 	JTextArea FileArea;
 	DragNDrop egg;
 	JButton btnSending;
+	JButton btnOpen;
 
 	
 	
@@ -110,6 +111,24 @@ public class Client extends JFrame {
 		JScrollPane scroll = new JScrollPane(FileArea);
 		scroll.setBounds(39, 493, 475, 113);
 		contentPane.add(scroll);
+		
+		btnOpen = new JButton("Open");
+		btnOpen.setBounds(218, 250, 106, 27);
+		contentPane.add(btnOpen);
+		btnOpen.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				//서버한테 물어봐서 이미지 오는거 허락되면
+				//ImageView 실행
+				getImage();
+				
+				
+				
+				
+			}
+		
+	});
 
 		/*
 		 * contentPane.add(new JScrollPane(textArea_1)); textArea_1.setEditable(false);
@@ -229,7 +248,18 @@ public class Client extends JFrame {
 	/**
 	 * Prompt for and return the desired screen name.
 	 */
+	//////////////////////////////////////////////////////////////이미지 프레임 /////////////////////////////////////
+	
+	private void getImage() 
+	{
+		this.imageView = new ImageView();
+		this.imageView.setVisible(true);
+	}
+	
 //////////////////////////////////////////////////////////////////////// 보안 질문 프레임 ////////////////////////////////////////////////////////////////////////////////
+	
+	
+	
 	
 	private void getQnA() {
 		this.securityQnA = new SecurityQnA(); // 로그인창 보이기

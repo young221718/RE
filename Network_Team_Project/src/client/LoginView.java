@@ -88,8 +88,6 @@ public class LoginView extends JFrame{
 		panel.add(btnJoin);
 		
 		
-      
-       
         btnLogin = new JButton("LOGIN");
         btnLogin.setBounds(226, 311, 75, 27);
         panel.add(btnLogin);
