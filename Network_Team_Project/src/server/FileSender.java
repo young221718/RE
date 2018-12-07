@@ -37,10 +37,7 @@ public class FileSender extends Room {
 		 */
 		try {
 
-			String group_name = db.GetRoomName(portNumber);
-			System.out.println("group name: " + group_name);
-
-			File file = new File("C:\\RE\\" + group_name); // 각 그룹명으로 저장된 폴더
+			File file = new File("C:\\RE\\" + portNumber); // 각 그룹명으로 저장된 폴더
 
 			File[] fileList = file.listFiles();
 			String filepath = null;

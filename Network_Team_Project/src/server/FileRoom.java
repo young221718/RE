@@ -1,19 +1,14 @@
 package server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 import basic.Room;
-import basic.RoomInformation;
 
 public class FileRoom extends Room {
 
@@ -37,10 +32,6 @@ public class FileRoom extends Room {
 			BufferedInputStream up = new BufferedInputStream(roomSocket.getInputStream());
 			DataInputStream fromClient = new DataInputStream(up);
 
-			String imageName = "익스샌프란01";
-			// toClient.writeObject(imageName);
-			System.out.println("file name: " + imageName);
-
 			int sign = 0;
 
 			String group_name = db.GetRoomName(portNumber);
@@ -51,7 +42,7 @@ public class FileRoom extends Room {
 				if (fPro == 77) {
 					int len = fromClient.readInt();
 					System.out.println(len + " received");
-					File f = new File("C:\\RE\\" + group_name);
+					File f = new File("C:\\RE\\" + portNumber);
 					if (f.exists() == false)
 						f.mkdirs();// folderNN - 폴더, groupNB - group_id
 
