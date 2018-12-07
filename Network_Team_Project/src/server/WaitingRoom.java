@@ -69,11 +69,10 @@ public class WaitingRoom extends Room {
 					System.out.println("Enter protocol 222");
 
 					int PIN = (Integer) fromClient.readObject();
-					
-					
+
 					if (db.IsAlreadyUser(PIN, email) || db.IsPossibleEnterRoom(PIN)) {
 						System.out.println("Possible");
-						
+
 						// send room's question
 						String q = db.GetRoomQuestion(PIN);
 						toClient.writeObject(q);
@@ -94,7 +93,8 @@ public class WaitingRoom extends Room {
 
 						// TODO: update room information current people
 						int temp = db.InsertRoomUser(PIN, email);
-						if(temp == 1) db.UpdateCurPeople(PIN);
+						if (temp == 1)
+							db.UpdateCurPeople(PIN);
 						System.out.println("temp = " + temp);
 						db.CommitDB();
 
@@ -292,8 +292,14 @@ public class WaitingRoom extends Room {
 			loadFileRoomServerSocket(PIN);
 		}
 		try {
-			// new FileRoom(fileRoomServerSockets.get(PIN).accept(), PIN).start();
-			new FileSender(fileRoomServerSockets.get(PIN).accept(), PIN).start();
+			if (false == db.IsSender(PIN)) {
+				//TODO: 어떤방에 들어갔는지 알려주는 프로토콜이 필요함.
+				new FileRoom(fileRoomServerSockets.get(PIN).accept(), PIN).start();
+				System.out.println("FILE RECIEVE");
+			} else {
+				new FileSender(fileRoomServerSockets.get(PIN).accept(), PIN).start();
+				System.out.println("FILE SENDER");
+			}
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();

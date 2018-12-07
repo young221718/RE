@@ -46,7 +46,7 @@ public class Database {
 				String userPSQL = "insert into user_information(user_name,email,password) values(?, ?, ?);";
 				userPS = (PreparedStatement) con.prepareStatement(userPSQL);
 
-				String roomPSQL = "insert into room_information values(?,?,?,?,?,?,?);";
+				String roomPSQL = "insert into room_information values(?,?,?,?,?,?,?,?);";
 				roomPS = (PreparedStatement) con.prepareStatement(roomPSQL);
 			}
 		} catch (SQLException e) {
@@ -397,15 +397,15 @@ public class Database {
 
 			Calendar temp = rf.startDate;
 			temp.add(rf.startDate.DATE, 1);
-			String id = ((Integer) rf.port).toString() + "." + sdf.format(temp.getTime()).substring(2);
-
+			
 			roomPS.setString(1, rf.groupName);
-			roomPS.setString(2, id);
+			roomPS.setInt(2, rf.port);
 			roomPS.setString(3, df.format(rf.startDate.getTime()));
 			roomPS.setString(4, df.format(rf.endDate.getTime()));
-			roomPS.setString(5, maxPeople.toString());
+			roomPS.setInt(5, maxPeople);
 			roomPS.setString(6, rf.securityQuestion);
 			roomPS.setString(7, rf.securityAnswer);
+			roomPS.setInt(8, 0);
 
 			int count = roomPS.executeUpdate();
 			if (count != 1) {
@@ -416,7 +416,29 @@ public class Database {
 		}
 		return true;
 	}
-
+	
+	/**
+	 * 
+	 * @param roomNumber
+	 * @return
+	 */
+	public boolean IsSender(int roomNumber) {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "select * from room_information where end_date <= date(now()) and group_id = " + roomNumber;
+			rs = stmt.executeQuery(sql);
+			
+			if(rs.next()) {
+				System.out.println(rs.getInt(2));
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	
 	/**
 	 * DisconnectDB 데이터 베이스와 연결을 끊는 메서드이다.
 	 */
