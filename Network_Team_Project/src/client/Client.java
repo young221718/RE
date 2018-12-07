@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -40,7 +41,7 @@ public class Client extends JFrame {
 	Socket socket; // waitingRoom socket
 	ImageView imageView;
 	// String serverAddress = getServerAddress();
-	String serverAddress = "192.9.11.86";
+	String serverAddress = "192.9.5.204";
 
 	ObjectInputStream inChat;
 	ObjectOutputStream outChat;
@@ -53,10 +54,16 @@ public class Client extends JFrame {
 	BufferedInputStream bis;
 	DataOutputStream dos;
 	
-	BufferedOutputStream toBuffer;
+	/*BufferedOutputStream toBuffer;
 	BufferedInputStream fromBuffer;
-	Socket filesenderSocket;
+	DataInputStream Dis;
+	ObjectOutputStream os;
+	Socket filesenderSocket;*/
 	
+	Socket filesenderSocket;
+	BufferedInputStream Bis;
+	DataInputStream Dis;
+	ObjectOutputStream Oos;
 	
 	Integer roomNum;
 	int valueQNA;
@@ -130,39 +137,45 @@ public class Client extends JFrame {
 		
 				
 				getImage();
-				try {
-					int file_num = in.read();
-					//imageView.imageInByte = new byte[imageView.file_num][]; 
-					byte[][] buffer = new byte[file_num][];
-					int sign=0;
 				
+				
+				try {
+					
+					Oos.writeInt(31);
+					Oos.flush();
+					int file_num = Bis.read();//그룹 폴더에 저장되어 있는 파일 갯수 
+					System.out.println("file_num: " + file_num);
+					//imageView.imageInByte = new byte[imageView.file_num][]; 
+					imageView.imageInByte = new byte[file_num][];
+					System.out.println("debug1");
+					int sign=0;
+					int j=0;
 					do {
-						int pro = in.read();
+						
+						int pro = Bis.read();
+						System.out.println("sender_pro ");
 						if (pro == 101) {
-							int len = fromBuffer.read();
-							System.out.println(len + " received");
-							/*File f = new File("C:\\RE\\" + group_name);
-							if (f.exists() == false)
-								f.mkdirs();// folderNN - 폴더, groupNB - group_id*/
-
-							//FileOutputStream toFile = new FileOutputStream(f + "\\" + email + a + ".png");
-							//BufferedOutputStream outFile = new BufferedOutputStream(toFile);
-							int ch = 0;
-
-							for(int j=0; j<file_num; j++) {
-								for (int i = 0; i < len; i++) {
-									toBuffer.write(buffer[j][i]);
-									
-								}
-								imageView.imageInByte[j] = buffer[j];
-							}
+							Oos.writeInt(13);
+							Oos.flush();
+							int len = Dis.readInt();
 							
-							sign = fromBuffer.read();
+							System.out.println(len + " received");
+
+							
+								imageView.imageInByte[j] = new byte[len];
+								for (int i = 0; i < len; i++) {
+									imageView.imageInByte[j][i] = (byte)Bis.read();
+								}
+								//imageView.imageInByte[j] = buffer[j];
+								j++;
+							
+							sign = Dis.read();
+							System.out.println(sign);
 							//a++;
 							//outFile.flush();
 							//outFile.close();
-							toBuffer.flush();
-							toBuffer.close();
+							//Bis.flush();
+							//Dis.close();
 						}
 					} while (sign != 8);
 					
@@ -339,23 +352,36 @@ public class Client extends JFrame {
 						outChat = new ObjectOutputStream(chatSocket.getOutputStream());
 						inChat = new ObjectInputStream(chatSocket.getInputStream());
 
+						
 						// 파일 소켓 연결
-						fileSocket = new Socket(serverAddress, roomNum + 1);
-						toServer = new BufferedOutputStream(fileSocket.getOutputStream());
-						dos = new DataOutputStream(fileSocket.getOutputStream());
-
-						filesenderSocket = new Socket(serverAddress, roomNum + 1);
-						toBuffer = new BufferedOutputStream(filesenderSocket.getOutputStream());
-						fromBuffer = new BufferedInputStream(filesenderSocket.getInputStream());
+						
+						if(in.readBoolean())
+						{
+							filesenderSocket = new Socket(serverAddress, roomNum + 1);
+							Bis = new BufferedInputStream(filesenderSocket.getInputStream());
+							Dis = new DataInputStream(Bis);
+							Oos = new ObjectOutputStream(filesenderSocket.getOutputStream());
+							//Bos = new BufferedOutputStream;
+							
+							
+							/*filesenderSocket = new Socket(serverAddress, roomNum + 1);
+							fromBuffer = new BufferedInputStream(filesenderSocket.getInputStream());
+							Dis = new DataInputStream(fromBuffer);
+							os = new ObjectOutputStream(filesenderSocket.getOutputStream());*/
+						} else {
+							fileSocket = new Socket(serverAddress, roomNum + 1);
+							toServer = new BufferedOutputStream(fileSocket.getOutputStream());
+							dos = new DataOutputStream(fileSocket.getOutputStream());
+						}
+						//toBuffer = new BufferedOutputStream(File);
+						//toBuffer = new BufferedOutputStream(filesenderSocket.getOutputStream());
 						//BufferedOutputStream toBuffer;
 						//BufferedInputStream inBuffer;
 						// TODO 쓰레드 끝내기
 						new ChatThread().start(); // 채팅쓰레드 실행
 						
 					}
-						
-					
-					
+								
 				} catch (IOException e1) {
 					
 					e1.printStackTrace();
