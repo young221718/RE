@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -21,6 +22,7 @@ import java.util.Calendar;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -96,7 +98,7 @@ public class Client extends JFrame {
 	JButton btnSending;
 	JButton btnOpen;
 
-	
+	ImageIcon img = null;
 	
 	public Client() {
 		info = new RoomInformation();
@@ -196,6 +198,7 @@ public class Client extends JFrame {
 		 */ // 파일명 나열_스크롤 만드는 부분
 
 		btnSending = new JButton("Sending"); // 파일 전송 버튼
+		btnSending.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 15));
 		btnSending.setBounds(218, 446, 106, 27);
 		contentPane.add(btnSending);
 		btnSending.addActionListener(new ActionListener() {
@@ -208,6 +211,7 @@ public class Client extends JFrame {
 		});
 	
 		JButton btnEntrance = new JButton("ENTRANCE");// 핀번호가 맞으면(TODO**맞는지 확인 : 보안질문으로??) -> 채팅방 입장
+		btnEntrance.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));
 		btnEntrance.setBounds(558, 67, 106, 38);
 		btnEntrance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -255,6 +259,7 @@ public class Client extends JFrame {
 		
 
 		JButton btnRoom = new JButton("ROOM"); // 방 만들기 버튼
+		btnRoom.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));
 		btnRoom.setBounds(558, 20, 79, 40);
 		btnRoom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -274,7 +279,7 @@ public class Client extends JFrame {
 		textArea.setEditable(false);
 		textArea.setBounds(558, 117, 350, 444);
 		JScrollPane scrollArea = new JScrollPane(textArea);
-		textArea.setCaretPosition(textArea.getDocument().getLength());
+		
 		scrollArea.setBounds(558, 117, 350, 444);
 		contentPane.add(scrollArea);
 
@@ -639,6 +644,13 @@ public class Client extends JFrame {
 			public void run() {
 				try {
 					Client REclient = new Client();
+					
+					ImageIcon back  = new ImageIcon("wood2.PNG");  //배경이미지
+				    JLabel imgLabel  = new JLabel(back);
+				    REclient.add(imgLabel);
+				    imgLabel.setVisible(true);
+				    imgLabel.setBounds(-3, -20, 940, 665);
+					
 					REclient.setVisible(true);
 					REclient.ConnectSocket();
 				} catch (Exception e) {
@@ -658,7 +670,7 @@ public class Client extends JFrame {
 					
 					tempChat = (Chat)inChat.readObject();
 					textArea.append(tempChat.getMessage(myChat.email)); // 채팅창에 출력 --> <유저 : 메세지>
-						
+					textArea.setCaretPosition(textArea.getDocument().getLength()); //자동 스크롤	
 
 				}
 				

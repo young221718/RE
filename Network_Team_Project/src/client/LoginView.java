@@ -1,8 +1,11 @@
 package client;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
- 
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -28,6 +31,9 @@ public class LoginView extends JFrame{
     public JTextField emailText;
     public JPasswordField passText;
     private boolean bLoginCheck;
+    
+    JPanel panel = new JPanel();
+    ImageIcon img = null;
    
     public static void main(String[] args) {
         //new LoginView();
@@ -42,37 +48,49 @@ public class LoginView extends JFrame{
        // setLocation(450, 350);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
        
-        // panel
-        JPanel panel = new JPanel();
-        placeLoginPanel(panel);
-       
-       
         // add
         add(panel);
-       
-        // visiible
         setVisible(true);
+        
+        // panel
+       // JPanel panel = new JPanel();
+        placeLoginPanel(panel);
+        
+        //ImageIcon back  = new ImageIcon("RE_img.PNG");  //배경이미지
+     	ImageIcon back  = new ImageIcon("RE_img3.PNG");  //배경이미지
+        JLabel imgLabel  = new JLabel(back);
+        panel.add(imgLabel);
+        imgLabel.setVisible(true);
+        imgLabel.setBounds(-3, -20, 940, 665);
+       
+
     }
    
     public void placeLoginPanel(JPanel panel){
         panel.setLayout(null);     
         
-        JLabel HelloLabel = new JLabel("\u2605 Hello! Welcome to RE! \u2605");
-        HelloLabel.setBounds(122, 112, 209, 18);
+        JLabel HelloLabel = new JLabel("Hello! Welcome to RE!");
+        HelloLabel.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 20));  //=========================== 글씨체 바꾸는 코드
+        HelloLabel.setForeground(Color.white);
+        HelloLabel.setBounds(122, 119, 209, 18);
 		panel.add(HelloLabel);
         
         JLabel passLabel = new JLabel("E-mail");
-        passLabel.setBounds(122, 163, 62, 18);
+        passLabel.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 18));  //======================== 글씨체 바꾸는 코드
+        passLabel.setForeground(Color.white);
+        passLabel.setBounds(122, 183, 62, 18);
         panel.add(passLabel);
         
         emailText = new JTextField();
-        emailText.setBounds(122, 193, 181, 24);
+        emailText.setBounds(122, 203, 181, 24);
         panel.add(emailText);
         emailText.setColumns(10);
         
         
         JLabel PassLabel = new JLabel("Password");
-        PassLabel.setBounds(122, 229, 90, 18);
+        PassLabel.setForeground(Color.white);
+        PassLabel.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 18));  //=========================== 글씨체 바꾸는 코드
+        PassLabel.setBounds(122, 239, 90, 18);
         panel.add(PassLabel);
        
         
@@ -84,12 +102,14 @@ public class LoginView extends JFrame{
         
         
 		btnJoin = new JButton("JOIN");
-		btnJoin.setBounds(122, 311, 79, 27);
+		btnJoin.setFont(new Font("Berlin Sans FB Demi", Font.PLAIN, 13));
+		btnJoin.setBounds(122, 321, 79, 27);
 		panel.add(btnJoin);
 		
 		
         btnLogin = new JButton("LOGIN");
-        btnLogin.setBounds(226, 311, 75, 27);
+        btnLogin.setFont(new Font("Berlin Sans FB Demi", Font.PLAIN, 13));
+        btnLogin.setBounds(226, 321, 75, 27);
         panel.add(btnLogin);
         
 //        btnLogin.addActionListener(new ActionListener() {

@@ -4,6 +4,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +33,7 @@ public class JoinView extends JFrame {
 			public void run() {
 				try {
 					JoinView frame = new JoinView();
+					//frame.setUndecorated(true);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -40,13 +42,25 @@ public class JoinView extends JFrame {
 		});
 	}
 
+	protected void setBorderPainted(boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public JoinView() {
+		//setUndecorated(true);
+		Color backColor = new Color(255,255,255);
+		/*색깔 후보*/ //(250,224,212)
 		
 		setTitle("Join");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(350, 295, 470, 300);  //왼쪽, 아래, 가로, 세로
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBackground(backColor);   //배경색 바꾸는 부분
+		
+		
+		
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
@@ -56,18 +70,18 @@ public class JoinView extends JFrame {
 		
 		JoinName = new JTextField();
 		JoinName.setText("name");
-		JoinName.setBounds(180, 49, 160, 24);
+		JoinName.setBounds(190, 49, 160, 24);
 		contentPane.add(JoinName);
 		JoinName.setColumns(10);
 		
 		
 		JLabel lblEmail = new JLabel("E - mail");
-		lblEmail.setBounds(91, 85, 62, 18);
+		lblEmail.setBounds(101, 85, 62, 18);
 		contentPane.add(lblEmail);
 		
 		JoinEmailAdd = new JTextField();
 		JoinEmailAdd.setText("email address");
-		JoinEmailAdd.setBounds(180, 82, 160, 24);
+		JoinEmailAdd.setBounds(190, 82, 160, 24);
 		contentPane.add(JoinEmailAdd);
 		JoinEmailAdd.setColumns(10);
 		
@@ -79,29 +93,34 @@ public class JoinView extends JFrame {
 		
 		Joinpass = new JPasswordField();
 		Joinpass.setText("password");
-		Joinpass.setBounds(180, 115, 160, 24);
+		Joinpass.setBounds(190, 115, 160, 24);
 		contentPane.add(Joinpass);
 		Joinpass.setEchoChar('*');
 		Joinpass.setColumns(10);
 		
 		JLabel lblPwCheck = new JLabel("Check PW");
-		lblPwCheck.setBounds(91, 151, 78, 18);
+		lblPwCheck.setBounds(101, 151, 78, 18);
 		contentPane.add(lblPwCheck);
 		
 		JoinCheck = new JPasswordField();
 		JoinCheck.setText("check");
-		JoinCheck.setBounds(180, 148, 160, 24);
+		JoinCheck.setBounds(190, 148, 160, 24);
 		contentPane.add(JoinCheck);
 		JoinCheck.setEchoChar('*');
 		JoinCheck.setColumns(10);
 		
 		
 		btnConfirm = new JButton("Confirm");
-		btnConfirm.setBounds(156, 197, 105, 27);
+		btnConfirm.setBounds(170, 197, 105, 27);
 		contentPane.add(btnConfirm);
 		
 		
 	}
+
+//	private Color Color(int i, int j, int k) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	public void setMain(Client client) {
 		this.getInfo = client;
