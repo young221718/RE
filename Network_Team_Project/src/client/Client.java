@@ -9,6 +9,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.LineNumberInputStream;
 import java.io.ObjectInputStream;
@@ -39,7 +40,7 @@ public class Client extends JFrame {
 	Socket socket; // waitingRoom socket
 	ImageView imageView;
 	// String serverAddress = getServerAddress();
-	String serverAddress = "172.16.34.151";
+	String serverAddress = "192.9.11.86";
 
 	ObjectInputStream inChat;
 	ObjectOutputStream outChat;
@@ -51,6 +52,11 @@ public class Client extends JFrame {
 	FileInputStream fis;
 	BufferedInputStream bis;
 	DataOutputStream dos;
+	
+	BufferedOutputStream toBuffer;
+	BufferedInputStream fromBuffer;
+	Socket filesenderSocket;
+	
 	
 	Integer roomNum;
 	int valueQNA;
@@ -121,8 +127,50 @@ public class Client extends JFrame {
 				
 				//서버한테 물어봐서 이미지 오는거 허락되면
 				//ImageView 실행
-				getImage();
+		
 				
+				getImage();
+				try {
+					int file_num = in.read();
+					//imageView.imageInByte = new byte[imageView.file_num][]; 
+					byte[][] buffer = new byte[file_num][];
+					int sign=0;
+				
+					do {
+						int pro = in.read();
+						if (pro == 101) {
+							int len = fromBuffer.read();
+							System.out.println(len + " received");
+							/*File f = new File("C:\\RE\\" + group_name);
+							if (f.exists() == false)
+								f.mkdirs();// folderNN - 폴더, groupNB - group_id*/
+
+							//FileOutputStream toFile = new FileOutputStream(f + "\\" + email + a + ".png");
+							//BufferedOutputStream outFile = new BufferedOutputStream(toFile);
+							int ch = 0;
+
+							for(int j=0; j<file_num; j++) {
+								for (int i = 0; i < len; i++) {
+									toBuffer.write(buffer[j][i]);
+									
+								}
+								imageView.imageInByte[j] = buffer[j];
+							}
+							
+							sign = fromBuffer.read();
+							//a++;
+							//outFile.flush();
+							//outFile.close();
+							toBuffer.flush();
+							toBuffer.close();
+						}
+					} while (sign != 8);
+					
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 				
 				
@@ -138,7 +186,7 @@ public class Client extends JFrame {
 		btnSending.setBounds(218, 446, 106, 27);
 		contentPane.add(btnSending);
 		btnSending.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		public void actionPerformed(ActionEvent arg0) {
 				
 				run();
 
@@ -296,6 +344,11 @@ public class Client extends JFrame {
 						toServer = new BufferedOutputStream(fileSocket.getOutputStream());
 						dos = new DataOutputStream(fileSocket.getOutputStream());
 
+						filesenderSocket = new Socket(serverAddress, roomNum + 1);
+						toBuffer = new BufferedOutputStream(filesenderSocket.getOutputStream());
+						fromBuffer = new BufferedInputStream(filesenderSocket.getInputStream());
+						//BufferedOutputStream toBuffer;
+						//BufferedInputStream inBuffer;
 						// TODO 쓰레드 끝내기
 						new ChatThread().start(); // 채팅쓰레드 실행
 						
@@ -607,7 +660,7 @@ public class Client extends JFrame {
 				   System.out.println(f.length() + "rec");
 				   dos.writeInt(bis.available());
 				   int ch =0;
-					
+
 				   while ((ch = bis.read()) != -1 ) {
 					   toServer.write(ch);
 	               }

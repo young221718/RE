@@ -17,7 +17,9 @@ public class ImageView extends JFrame{
     JButton btnDownload;
     
     static BufferedImage img = null;
-    byte[][] imageInByte;
+   // public int file_num;
+    //public int pro;
+    byte[][] imageInByte; // = new byte[file_num][]; 
 	
 	public ImageView() {
         // setting
@@ -72,6 +74,7 @@ public class ImageView extends JFrame{
 	}
 	
 	public static void main(String[] args) {
+		
 	}
 
 }

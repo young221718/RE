@@ -31,28 +31,31 @@ public class FileSender extends Room {
 		 * 폴더에 저장되어 있는 파일 전부 보내기!
 		 */
 		try {
-			if (sender_pro == 101) {
+			
 				String group_name = db.GetRoomName(portNumber);
 
 				File file = new File("C:\\RE\\" + group_name); // 각 그룹명으로 저장된 폴더
 
 				File[] fileList = file.listFiles();
-				String filename = null;
+				String filepath = null;
 
 				BufferedOutputStream toClient_Re = null;
 				BufferedInputStream Bin = null;
 				FileInputStream Fin = null;
 				DataOutputStream Dout = null;
 
+				Dout.write(fileList.length); // 보내는 파일 개수 전송
+				int sign=0;
 				for (int i = 0; i < fileList.length; i++) {
+					Dout.write(sender_pro); // 프로토콜 전송 - 파일 간다는 신호
 					File files = fileList[i];
 					System.out.println(files.getName());
-					filename = files.getPath();
+					filepath = files.getPath();
 					toClient_Re = new BufferedOutputStream(roomSocket.getOutputStream());
 					Dout = new DataOutputStream(roomSocket.getOutputStream());
-					Dout.writeUTF(filename);
+					//Dout.writeUTF(filepath);
 
-					Fin = new FileInputStream(filename);
+					Fin = new FileInputStream(filepath);
 					Bin = new BufferedInputStream(Fin);
 
 					Dout.writeInt(Bin.available());
@@ -62,9 +65,13 @@ public class FileSender extends Room {
 					}
 					toClient_Re.flush();
 					// new Thread().sleep(1000);
+					if( i == fileList.length) {
+						sign = 8;
+						toClient_Re.write(sign);
+					}
 				}
 				Fin.close();
-			}
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

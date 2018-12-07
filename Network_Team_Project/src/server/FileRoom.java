@@ -33,8 +33,7 @@ public class FileRoom extends Room {
 		int a = 0;
 		System.out.println("Enter the FileRoom!");
 		try {
-			// ObjectOutputStream toCleint = new
-			// ObjectOutputStream(roomSocket.getOutputStream());
+		
 			BufferedInputStream up = new BufferedInputStream(roomSocket.getInputStream());
 			DataInputStream fromClient = new DataInputStream(up);
 
@@ -42,8 +41,6 @@ public class FileRoom extends Room {
 			// toClient.writeObject(imageName);
 			System.out.println("file name: " + imageName);
 
-			// InputStream in = roomSocket.getInputStream();
-			// DataInputStream in = roomSocket.getInputStream();
 			int sign = 0;
 
 			String group_name = db.GetRoomName(portNumber);
@@ -58,7 +55,7 @@ public class FileRoom extends Room {
 					if (f.exists() == false)
 						f.mkdirs();// folderNN - Æú´õ, groupNB - group_id
 
-					FileOutputStream toFile = new FileOutputStream(f + "\\" + a + ".png");
+					FileOutputStream toFile = new FileOutputStream(f + "\\" + email + a + ".png");
 					BufferedOutputStream outFile = new BufferedOutputStream(toFile);
 					int ch = 0;
 
