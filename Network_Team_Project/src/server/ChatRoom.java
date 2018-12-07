@@ -49,7 +49,7 @@ public class ChatRoom extends Room {
 			input = new Chat();
 			input.email = "";
 			input.name = "";
-			input.message = "========<" + db.GetUserName(email) + " enter>=========\n";
+			input.message = "================<" + db.GetUserName(email) + " enter>=================\n";
 			for (ObjectOutputStream oos : broadcaster.get(portNumber).values()) {
 				oos.writeObject(input);
 				oos.flush();

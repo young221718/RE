@@ -294,11 +294,17 @@ public class WaitingRoom extends Room {
 		try {
 			if (false == db.IsSender(PIN)) {
 				//TODO: 어떤방에 들어갔는지 알려주는 프로토콜이 필요함.
-				new FileRoom(fileRoomServerSockets.get(PIN).accept(), PIN).start();
+				toClient.writeBoolean(false);
+				toClient.flush();
 				System.out.println("FILE RECIEVE");
+				new FileRoom(fileRoomServerSockets.get(PIN).accept(), PIN).start();
+				
 			} else {
-				new FileSender(fileRoomServerSockets.get(PIN).accept(), PIN).start();
+				toClient.writeBoolean(true);
+				toClient.flush();
 				System.out.println("FILE SENDER");
+				new FileSender(fileRoomServerSockets.get(PIN).accept(), PIN).start();
+				
 			}
 			return true;
 		} catch (Exception e) {
