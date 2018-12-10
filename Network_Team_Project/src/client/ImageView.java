@@ -6,6 +6,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -183,21 +186,14 @@ public class ImageView extends JFrame{
                
                for(int i=0;i<imageInByte.length;i++)
                {
-                  try {
-                  img = ImageIO.read(new ByteArrayInputStream(imageInByte[i]));
-               } catch (IOException e2) {
-                  // TODO Auto-generated catch block
-                  e2.printStackTrace();
-               }
-            
-                 
-
                  try {
                        File f = new File("C:\\RE\\Download"); //save path
                     if (f.exists() == false)
                        f.mkdirs();
+                    Path path = Paths.get(f +"\\"+i+Client.ExtArr[i]);
+                    Files.write(path,imageInByte[i]);
                  
-                    ImageIO.write(img, "png", new File(f+"\\"+i+"image.png"));
+                    //ImageIO.write(img,Client.ExtArr[i], new File(f+"\\"+i+Client.ExtArr[i]));
             } catch (IOException e1) {
                // TODO Auto-generated catch block
                e1.printStackTrace();

@@ -60,6 +60,7 @@ public class Client extends JFrame {
 	BufferedInputStream bis;
 	DataOutputStream dos;
 	
+	
 	/*BufferedOutputStream toBuffer;
 	BufferedInputStream fromBuffer;
 	DataInputStream Dis;
@@ -73,6 +74,7 @@ public class Client extends JFrame {
 	
 	Integer roomNum;
 	int valueQNA;
+	public static String[] ExtArr;
 	
 	PrintWriter OUT; // 유저가 문장을 입력하는 부분에 사용됨
 	LoginView loginView;
@@ -166,6 +168,7 @@ public class Client extends JFrame {
 	               Oos.writeInt(31);
 	               Oos.flush();
 	               int file_num = Bis.read();//그룹 폴더에 저장되어 있는 파일 갯수 
+	               ExtArr = new String[file_num];
 	               System.out.println("file_num: " + file_num);
 	               //imageView.imageInByte = new byte[imageView.file_num][]; 
 	               imageView.imageInByte = new byte[file_num][];
@@ -179,6 +182,9 @@ public class Client extends JFrame {
 	                  if (pro == 101) {
 	                     Oos.writeInt(13);
 	                     Oos.flush();
+	                     
+	                     ExtArr[j] = Dis.readUTF();
+	                     
 	                     int len = Dis.readInt();
 	                     
 	                     System.out.println(len + " received");
@@ -731,6 +737,12 @@ public class Client extends JFrame {
 				
 				   System.out.println(egg.listA.get(i));  // egg.listA.get(i) = File path of i'th File
 				   File f = new File(egg.listA.get(i));
+				   String temp = egg.listA.get(i);
+				   int Extn = temp.indexOf(".");
+				   String Ext = temp.substring(Extn,temp.length());
+				   
+				   System.out.println(Ext);
+				   dos.writeUTF(Ext);
 				   fis = new FileInputStream(f);
 				   bis = new BufferedInputStream(fis);
 				   System.out.println(f.length() + "rec");

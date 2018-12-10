@@ -72,6 +72,10 @@ public class FileSender extends Room {
 
 				File files = fileList[i]; // file list in group's folder 
 				filepath = files.getPath(); // location that file saved
+				String temp = filepath;
+				int Extn = temp.indexOf(".");
+				String Ext = temp.substring(Extn,temp.length());
+				Dout.writeUTF(Ext);
 
 				Fin = new FileInputStream(filepath); 
 				Bin = new BufferedInputStream(Fin);

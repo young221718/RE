@@ -50,6 +50,8 @@ public class FileRoom extends Room {
             int fPro = up.read(); // Read the protocol that the client sends a picture
 
             if (fPro == 77) { // Client sends file
+            	String Ext = (String)fromClient.readUTF();
+            	System.out.println(Ext);
                int len = fromClient.readInt(); // file's length
                System.out.println(len + " received"); 
                
@@ -61,7 +63,7 @@ public class FileRoom extends Room {
                   f.mkdirs();
 
                // Save each file without duplication by user's email and index 
-               FileOutputStream toFile = new FileOutputStream(f + "\\" + email + a + ".png");
+               FileOutputStream toFile = new FileOutputStream(f + "\\" + email + a + Ext);
                
                //Write the file using outFile
                BufferedOutputStream outFile = new BufferedOutputStream(toFile);
