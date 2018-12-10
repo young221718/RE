@@ -12,28 +12,21 @@ import com.mysql.jdbc.Statement;
 
 import basic.RoomInformation;
 
+/**
+ * Database Class
+ * 
+ * This class will be control database. Every work of database operation will be
+ * controlled in this class
+ * 
+ * @author Young
+ *
+ */
 public class Database {
 	Connection con = null;
 	PreparedStatement userPS = null;
 	PreparedStatement roomPS = null;
-
 	Statement stmt = null;
 	ResultSet rs = null;
-
-	// public static void main(String[] args) {
-	// Database redb = new Database();
-	//
-	// System.out.println(redb.InsertUserInfor("ChanYoung", "young221718@gmail.com",
-	// "1234"));
-	// System.out.println(redb.CheckPassword("young221718@gmail.com", "1234"));
-	//
-	// // try {
-	// // //redb.con.commit();
-	// // } catch (SQLException e) {
-	// // // TODO Auto-generated catch block
-	// // e.printStackTrace();
-	// // }
-	// }
 
 	/**
 	 * constructor
@@ -55,7 +48,9 @@ public class Database {
 	}
 
 	/**
-	 * ConnectDB 데이터베이스에 연결하는 메서드입니다.
+	 * ConnectDB
+	 *
+	 * Connect java to database
 	 */
 	public void ConnectDB() {
 		try {
@@ -73,7 +68,9 @@ public class Database {
 	}
 
 	/**
-	 * insertUserInfor 유저 정보를 데이터베이스에 추가하고 싶을 때 쓰면 되는 함수이다.
+	 * InsertUserInfor
+	 * 
+	 * Insert user information in user information relation
 	 * 
 	 * @param name
 	 *            - user's name
@@ -113,7 +110,9 @@ public class Database {
 	}
 
 	/**
-	 * GetUserName get user's name from database to use email
+	 * GetUserName
+	 * 
+	 * get user's name from database to use email
 	 * 
 	 * @param email
 	 *            user's email
@@ -137,11 +136,12 @@ public class Database {
 	}
 
 	/**
-	 * GetRoomQuetion: 방 보안질문을 받아오는 메소드
+	 * GetRoomQuestion
+	 * 
+	 * Get room question search by room number
 	 * 
 	 * @param roomNum
-	 *            방 번호
-	 * @return String 방 번호에 해당하는 질문이다.
+	 * @return String the room question
 	 */
 	public String GetRoomQuestion(int roomNum) {
 		try {
@@ -163,9 +163,11 @@ public class Database {
 	/**
 	 * CheckRoomAnswer
 	 * 
+	 * Check the specific room's answer is correct or not
+	 * 
 	 * @param String
-	 *            an user's answer
-	 * @return return 1 if success, return -1 if fail, return -2 if sql error
+	 *            - an user's answer
+	 * @return return 1 if correct, return -1 if wrong, return -2 if sql error
 	 */
 	public int CheckRoomAnswer(String an, int roomNum) {
 		try {
@@ -183,6 +185,10 @@ public class Database {
 	}
 
 	/**
+	 * InsertRoomUser
+	 * 
+	 * Insert to room user relation with user's email and room number. email and
+	 * room number combination will be unique
 	 * 
 	 * @param roomNumber
 	 * @param email
@@ -201,12 +207,16 @@ public class Database {
 			}
 
 		} catch (SQLException e) {
-
+			e.printStackTrace();
 		}
 		return 0;
 	}
 
 	/**
+	 * UpdateCurPeople
+	 * 
+	 * update current people in room information in database. if new user enter the
+	 * room plus 1 to current people
 	 * 
 	 * @param roomNumber
 	 * @return success return 1, else return -1
@@ -220,12 +230,15 @@ public class Database {
 			if (cnt == 1)
 				return 1;
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 		return -1;
 	}
 
 	/**
+	 * IsPosiibleEnterRoom
+	 * 
+	 * Check if specific room can be entered or not
 	 * 
 	 * @param roomNumber
 	 * @return if possible return true, else return false
@@ -242,12 +255,15 @@ public class Database {
 					return true;
 			}
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 		return false;
 	}
-	
+
 	/**
+	 * IsAlreadyUser
+	 * 
+	 * Check if user already enter the room or not.
 	 * 
 	 * @param roomNumber
 	 * @param email
@@ -260,11 +276,11 @@ public class Database {
 			String sql = "select * from room_user where group_id = " + roomNumber + " and email = '" + email + "'";
 			System.out.println(sql);
 			rs = stmt.executeQuery(sql);
-			
+
 			boolean temp = rs.next();
-			System.out.println("is already user?: "+temp);
+			System.out.println("is already user?: " + temp);
 			return temp;
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -272,7 +288,9 @@ public class Database {
 	}
 
 	/**
-	 * UpdateRoomNumber update room number add two
+	 * UpdateRoomNumber
+	 * 
+	 * update room number add two
 	 * 
 	 * @return success return 1, else 0 or -1
 	 */
@@ -289,7 +307,9 @@ public class Database {
 	}
 
 	/**
-	 * GetRoomNumber get room number from database
+	 * GetRoomNumber
+	 * 
+	 * get room number from database
 	 * 
 	 * @return if success return PIN, else return 01;
 	 */
@@ -311,8 +331,10 @@ public class Database {
 	/**
 	 * GetRoomName
 	 * 
+	 * Get room name from database.
+	 * 
 	 * @param roomNum
-	 *            pin number
+	 *            - pin number
 	 * @return room name (group name)
 	 */
 	public String GetRoomName(int roomNum) {
@@ -331,10 +353,12 @@ public class Database {
 	}
 
 	/**
-	 * CheckRoomExist check if room is already exist in database
+	 * CheckRoomExist
+	 * 
+	 * check if room is already exist in database
 	 * 
 	 * @param roomNum
-	 *            room number which want to check
+	 *            - room number which want to check
 	 * @return if exist return true, else return false
 	 */
 	public boolean CheckRoomExist(int roomNum) {
@@ -347,20 +371,21 @@ public class Database {
 				return false; // not exist
 
 		} catch (SQLException e) {
-
+			e.printStackTrace();
 		}
 		return true;
 	}
 
 	/**
-	 * CheckPassword - 로그인을 하기 위한 메서드
+	 * CheckPassword
+	 * 
+	 * Check password is match with email
 	 * 
 	 * @param email
-	 *            - 이메일
 	 * @param pw
-	 *            - 비밀번호
-	 * @return int // 1: correct password // 0: SQL error // -1: wrong password //
-	 *         -2: not exist email
+	 *            - password
+	 * @return if correct password return 1, else if SQL error return 0, else if
+	 *         wrong password return -1 else if not exist email return -2
 	 */
 	public int CheckPassword(String email, String pw) {
 
@@ -383,21 +408,23 @@ public class Database {
 	}
 
 	/**
-	 * InsertRoomInfor 방 정보를 데이터베이스에 추가함.
+	 * InsertRoomInfor
+	 *
+	 * Insert room information to database room_information relation
 	 * 
 	 * @param rf
-	 *            - RoomInformation 클래스를 받아옴
+	 *            - RoomInformation class
 	 * @return boolean - if success return true, else return false
 	 */
 	public boolean InsertRoomInfor(RoomInformation rf) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		// SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		try {
 			Integer maxPeople = rf.howManyPeople;
 
 			Calendar temp = rf.startDate;
-			temp.add(rf.startDate.DATE, 1);
-			
+			temp.add(Calendar.DATE, 1);
+
 			roomPS.setString(1, rf.groupName);
 			roomPS.setInt(2, rf.port);
 			roomPS.setString(3, df.format(rf.startDate.getTime()));
@@ -416,19 +443,22 @@ public class Database {
 		}
 		return true;
 	}
-	
+
 	/**
+	 * IsSender
+	 * 
+	 * Check if room is closed or not
 	 * 
 	 * @param roomNumber
-	 * @return
+	 * @return if room is open room return true else return false
 	 */
 	public boolean IsSender(int roomNumber) {
 		try {
 			stmt = (Statement) con.createStatement();
 			String sql = "select * from room_information where end_date <= date(now()) and group_id = " + roomNumber;
 			rs = stmt.executeQuery(sql);
-			
-			if(rs.next()) {
+
+			if (rs.next()) {
 				System.out.println(rs.getInt(2));
 				return true;
 			}
@@ -437,10 +467,52 @@ public class Database {
 		}
 		return false;
 	}
-	
-	
+
 	/**
-	 * DisconnectDB 데이터 베이스와 연결을 끊는 메서드이다.
+	 * GetOpenRoomNumberSet
+	 * 
+	 * Get room number that is opened. Return opened room set
+	 * 
+	 * @return ResultSet
+	 */
+	public ResultSet GetOpenRoomNumberSet() {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "select group_id from room_information where end_date = date(now())";
+			rs = stmt.executeQuery(sql);
+
+			return rs;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * GetOpenRoomEmailSet
+	 * 
+	 * Get email information who opened room user. Return email set.
+	 * 
+	 * @param roomNumber
+	 * @return ResultSet
+	 */
+	public ResultSet GetOpenRoomEmailSet(int roomNumber) {
+		try {
+			stmt = (Statement) con.createStatement();
+			String sql = "select email from room_user where group_id = " + roomNumber;
+			rs = stmt.executeQuery(sql);
+
+			return rs;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * DisconnectDB
+	 * 
+	 * disconnect database
 	 */
 	public void DisconnectDB() {
 
@@ -457,7 +529,9 @@ public class Database {
 	}
 
 	/**
-	 * CommitDB : 데이터베이스를 커밋한다.
+	 * CommitDB
+	 * 
+	 * commit database
 	 */
 	public void CommitDB() {
 		try {
@@ -468,5 +542,4 @@ public class Database {
 			e.printStackTrace();
 		}
 	}
-
 }

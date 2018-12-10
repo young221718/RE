@@ -6,6 +6,14 @@ import java.net.Socket;
 
 import server.Database;
 
+/**
+ * Room abstract class
+ * 
+ * Room class is parent class of waiting room, chat room, file room, file sender.
+ * Common variable will be here.
+ * @author Young
+ *
+ */
 public abstract class Room extends Thread{
    protected ServerSocket welcomeSocket;
    protected Socket roomSocket;
