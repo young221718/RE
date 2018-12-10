@@ -1,5 +1,6 @@
 package client;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -47,7 +48,7 @@ public class Client extends JFrame {
 	Socket socket; // waitingRoom socket
 	ImageView imageView;
 	// String serverAddress = getServerAddress();
-	String serverAddress = "172.30.65.209";
+	String serverAddress = "192.9.5.197";
 
 	ObjectInputStream inChat;
 	ObjectOutputStream outChat;
@@ -265,16 +266,12 @@ public class Client extends JFrame {
 					else
 					{
 						System.out.println("없는 방");
-						//TODO 에러창
+						txtPinNum.setText("Wrong!");
+						txtPinNum.setForeground(Color.red);
+						
 					}
 					
-					
-				
-					
-					
-					
-					
-					
+
 
 					/*
 					 * fileSocket = new Socket(serverAddress, roomNum+1); // 소켓생성과 서버의 IP받기 inFile =
@@ -380,11 +377,8 @@ public class Client extends JFrame {
 	
 	private void getQnA() {
 		this.securityQnA = new SecurityQnA(); // 로그인창 보이기
-		//System.out.println("3");
 		this.securityQnA.setMain(this);
-		//System.out.println("2");
 		this.securityQnA.setVisible(true);
-		//System.out.println("1");
 		
 		securityQnA.QNAConf.addActionListener(new ActionListener() {
 			@Override
@@ -487,6 +481,7 @@ public class Client extends JFrame {
 					{
 						//잘못된 비밀번호
 						System.out.println("185 : 비밀번호 불일치!");
+						loginView.Error.setVisible(true);
 					}
 					else if(value == 187)
 					{
@@ -526,10 +521,12 @@ public class Client extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String name = joinView.JoinName.getText();
 				String email = joinView.JoinEmailAdd.getText();
-				/**/
-				//if()
 				
-				/**/
+				if(!mailCheck.isEmail(email))  //
+				{
+					return;
+				}
+				
 				
 				String pw1 = joinView.Joinpass.getText();
 				String pw2 = joinView.JoinCheck.getText();

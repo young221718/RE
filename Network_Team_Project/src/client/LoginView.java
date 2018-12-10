@@ -95,10 +95,10 @@ public class LoginView extends JFrame{
 		passText.setColumns(10);
 		
 		
-		Error = new JLabel("Wrong!");
-		Error.setForeground(Color.red);
-		Error.setFont(new Font("Berlin Sans FB Demi", Font.PLAIN, 18));  //Set font
-		Error.setBounds(122, 295, 90, 18);
+		Error = new JLabel("Wrong PW!");
+		Error.setForeground(Color.orange);
+		Error.setFont(new Font("Berlin Sans FB Demi", Font.PLAIN, 17));  //Set font
+		Error.setBounds(122, 292, 90, 18);
 		Error.setVisible(false);
         panel.add(Error);
         
