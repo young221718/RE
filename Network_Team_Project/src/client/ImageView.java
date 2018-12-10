@@ -1,5 +1,6 @@
 package client;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -48,10 +49,15 @@ public class ImageView extends JFrame{
    
    public ImageView() {
         // setting
+	   Color backColor = new Color(255,255,255);
+	   
+	  
+	   
         setTitle("R");
         setSize(450, 500);
         setResizable(false);
         setBounds(200, 200, 700, 500); //왼쪽, 위, 가로, 세로
+        
        
         // panel
         JPanel panel = new JPanel();
@@ -61,6 +67,7 @@ public class ImageView extends JFrame{
        
         // visible
         setVisible(true);
+        panel.setBackground(backColor);
     }
    
    
@@ -82,8 +89,10 @@ public class ImageView extends JFrame{
        when it clicked.
        image will be change previous photo
        */
-      btnLeft = new JButton("<-");
-      btnLeft.setBounds(60,160, 50, 70);
+      ImageIcon icleft = new ImageIcon("left.png");
+      btnLeft = new JButton(icleft);
+      btnLeft.setBounds(40,160, 70, 90);
+      btnLeft.setBorderPainted(false);
       panel.add(btnLeft);
       btnLeft.addActionListener(new ActionListener() {          
             @Override
@@ -128,8 +137,10 @@ public class ImageView extends JFrame{
        when it clicked,
        image will be change to next photo
        */
-      btnRight = new JButton("->");
-      btnRight.setBounds(610,160,50,70);
+      ImageIcon right = new ImageIcon("right.png");
+      btnRight = new JButton(right);
+      btnRight.setBounds(590,160,70,85);
+      btnRight.setBorderPainted(false);
       panel.add(btnRight);
       btnRight.addActionListener(new ActionListener() {          
             @Override
@@ -179,6 +190,8 @@ public class ImageView extends JFrame{
        */
       btnDownload = new JButton("Download");
       btnDownload.setBounds(320,410,100,40);
+      Color yellow = new Color(255,220,108);
+      btnDownload.setBackground(yellow);
       panel.add(btnDownload);
       btnDownload.addActionListener(new ActionListener() {          
             @Override
