@@ -25,17 +25,27 @@ public class HostView extends JFrame {
     public JTextField userText,numJoinText,secQText,secAText,yearText,monthText,dateText;
     public JComboBox joinNum;
    
+    
+    /*
+     frame that user use when create a Room.
+     User can insert Room Information.
+     Room's inforamtion
+     -Room's number of people constratin
+     -Security Q&A
+     -Open Date
+     */
+    
+    
     public static void main(String[] args) {
-        //new LoginView();
     }
  
     public HostView() {
+    	
         //frame setting
         setTitle("Create R;E");
         setSize(400, 260);
         setResizable(false);
         setLocation(400, 300);
-       // setDefaultCloseOperation(EXIT_ON_CLOSE);
        
         
         JPanel panel = new JPanel();
@@ -147,6 +157,7 @@ public class HostView extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                main.disposeHost();
+               //dispose HostView Frame
             }
         });
        

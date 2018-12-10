@@ -27,7 +27,6 @@ public class LoginView extends JFrame{
    
     public JButton btnJoin;
     public JButton btnLogin;
-    //public JPasswordField ssText;
     public JTextField emailText;
     public JPasswordField passText;
     private boolean bLoginCheck;
@@ -36,24 +35,19 @@ public class LoginView extends JFrame{
     ImageIcon img = null;
    
     public static void main(String[] args) {
-        //new LoginView();
     }
  
     public LoginView() {
-        // setting
+        // GUI Setting
         setTitle("login");
         setSize(280, 150);
         setResizable(false);
-        setBounds(100, 100, 940, 665); //왼쪽, 위, 가로, 세로
-       // setLocation(450, 350);
+        setBounds(100, 100, 940, 665);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
        
         // add
         add(panel);
         setVisible(true);
-        
-        // panel
-       // JPanel panel = new JPanel();
         placeLoginPanel(panel);
         
      	ImageIcon back  = new ImageIcon("RE_img3.PNG");  //배경이미지
@@ -110,15 +104,6 @@ public class LoginView extends JFrame{
         btnLogin.setFont(new Font("Berlin Sans FB Demi", Font.PLAIN, 13));
         btnLogin.setBounds(226, 321, 75, 27);
         panel.add(btnLogin);
-        
-//        btnLogin.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//               //confirm 눌렀을때 액션 들어가는 부분, 이 버튼의 액션리스너를 통해 인풋값이 전송되고 소켓이 연결될예정
-//               //각각의 텍스트 Area에 입력된 값을 받아올경우엔 .getText() 등을 사용한다.(ex userText.getText()  )
-//               main.disposeLogin();
-//            }
-//        });
     }
    
    
