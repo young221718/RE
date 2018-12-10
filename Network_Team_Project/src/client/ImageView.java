@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -37,6 +38,7 @@ public class ImageView extends JFrame{
     JButton btnRight;
     JButton btnDownload;
     public ImageIcon ic;
+    Image imgC;
     
     
     static BufferedImage img = null;
@@ -103,11 +105,12 @@ public class ImageView extends JFrame{
                   try {
                      index = imageInByte.length-1;
                      img = ImageIO.read(new ByteArrayInputStream(imageInByte[index]));
+                     imgC = img.getScaledInstance(300, 370, java.awt.Image.SCALE_SMOOTH);
                      
                   } catch (IOException e1) {
                      e1.printStackTrace();
                   }
-                  ic.setImage(img);
+                  ic.setImage(imgC);
                   Image1.setIcon(ic);
                Image1.setVisible(false);
                Image1.setVisible(true);
@@ -116,11 +119,12 @@ public class ImageView extends JFrame{
                   try {
                      index--;
                   img = ImageIO.read(new ByteArrayInputStream(imageInByte[index]));
+                  imgC = img.getScaledInstance(300, 370, java.awt.Image.SCALE_SMOOTH);
                } catch (IOException e1) {
                   // TODO Auto-generated catch block
                   e1.printStackTrace();
                }
-                  ic.setImage(img);
+                  ic.setImage(imgC);
                   Image1.setIcon(ic);
                Image1.setVisible(false);
                Image1.setVisible(true);
@@ -150,12 +154,13 @@ public class ImageView extends JFrame{
                   try {
                      index = 0;
                      img = ImageIO.read(new ByteArrayInputStream(imageInByte[index]));
+                     imgC = img.getScaledInstance(300, 370, java.awt.Image.SCALE_SMOOTH);
                      
                   } catch (IOException e1) {
                      // TODO Auto-generated catch block
                      e1.printStackTrace();
                   }
-                  ic.setImage(img);
+                  ic.setImage(imgC);
                   Image1.setIcon(ic);
                Image1.setVisible(false);
                Image1.setVisible(true);
@@ -165,6 +170,7 @@ public class ImageView extends JFrame{
                   try {
                      index++;
                   img = ImageIO.read(new ByteArrayInputStream(imageInByte[index]));
+                  imgC = img.getScaledInstance(300, 370, java.awt.Image.SCALE_SMOOTH);
                   
                   
                } catch (IOException e1) {
@@ -172,7 +178,7 @@ public class ImageView extends JFrame{
                   e1.printStackTrace();
                }
                   
-                  ic.setImage(img);
+                  ic.setImage(imgC);
                Image1.setIcon(ic);
                Image1.setVisible(false);
                Image1.setVisible(true);

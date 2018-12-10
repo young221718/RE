@@ -370,11 +370,13 @@ public class Client extends JFrame {
 	   {
 	      try {
 	         this.imageView.img = ImageIO.read(new ByteArrayInputStream(imageView.imageInByte[imageView.index]));
+	         imageView.imgC = this.imageView.img.getScaledInstance(300, 370, java.awt.Image.SCALE_SMOOTH);
 	      } catch (IOException e) {
 	         // TODO Auto-generated catch block
 	         e.printStackTrace();
 	      }
-	      this.imageView.ic.setImage(imageView.img);
+	      this.imageView.ic.setImage(imageView.imgC);
+	      
 	      this.imageView.setVisible(true);
 	   }
 	
