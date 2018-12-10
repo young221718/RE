@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -65,6 +66,8 @@ public class JoinView extends JFrame {
 		contentPane.setLayout(null);
 		
 		JLabel lblUsername = new JLabel("UserName");
+		lblUsername.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 15));  //=========================== 글씨체 바꾸는 코드
+		lblUsername.setForeground(Color.black);
 		lblUsername.setBounds(91, 52, 78, 18);
 		contentPane.add(lblUsername);
 		
@@ -76,6 +79,8 @@ public class JoinView extends JFrame {
 		
 		
 		JLabel lblEmail = new JLabel("E - mail");
+		lblEmail.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 15));  //=========================== 글씨체 바꾸는 코드
+		lblEmail.setForeground(Color.black);
 		lblEmail.setBounds(101, 85, 62, 18);
 		contentPane.add(lblEmail);
 		
@@ -87,6 +92,8 @@ public class JoinView extends JFrame {
 		
 		
 		JLabel lblNewLabel = new JLabel("Password");
+		lblNewLabel.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 15));  //=========================== 글씨체 바꾸는 코드
+		lblNewLabel.setForeground(Color.black);
 		lblNewLabel.setBounds(91, 118, 78, 18);
 		contentPane.add(lblNewLabel);
 		
@@ -99,6 +106,8 @@ public class JoinView extends JFrame {
 		Joinpass.setColumns(10);
 		
 		JLabel lblPwCheck = new JLabel("Check PW");
+		lblPwCheck.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 15));  //=========================== 글씨체 바꾸는 코드
+		lblPwCheck.setForeground(Color.black);
 		lblPwCheck.setBounds(101, 151, 78, 18);
 		contentPane.add(lblPwCheck);
 		
@@ -111,6 +120,8 @@ public class JoinView extends JFrame {
 		
 		
 		btnConfirm = new JButton("Confirm");
+		btnConfirm.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 15));  //=========================== 글씨체 바꾸는 코드
+		btnConfirm.setForeground(Color.black);
 		btnConfirm.setBounds(170, 197, 105, 27);
 		contentPane.add(btnConfirm);
 		

@@ -43,7 +43,7 @@ public class Client extends JFrame {
 	Socket socket; // waitingRoom socket
 	ImageView imageView;
 	// String serverAddress = getServerAddress();
-	String serverAddress = "192.9.5.204";
+	String serverAddress = "192.168.1.136";
 
 	ObjectInputStream inChat;
 	ObjectOutputStream outChat;
@@ -86,7 +86,7 @@ public class Client extends JFrame {
 	Chat myChat = new Chat();    //유저가 서버에게 보낼  이메일, 이름, 메세지
 	Chat tempChat;               //서버에게 받는 유저의  이메일, 이름, 메세지
 	
-	
+	EmailCheck mailCheck; //메일의 유효성 검사를 위해 선언
 	
 	JPanel contentPane;
 	JTextField txtPinNum;
@@ -409,6 +409,7 @@ public class Client extends JFrame {
 				
 
 				emailAdd = loginView.emailText.getText();
+			
 				//passWord = loginView.passText.getPassword(); 
 			
 				String pw = "";

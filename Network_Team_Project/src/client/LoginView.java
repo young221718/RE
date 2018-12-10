@@ -56,7 +56,6 @@ public class LoginView extends JFrame{
        // JPanel panel = new JPanel();
         placeLoginPanel(panel);
         
-        //ImageIcon back  = new ImageIcon("RE_img.PNG");  //배경이미지
      	ImageIcon back  = new ImageIcon("RE_img3.PNG");  //배경이미지
         JLabel imgLabel  = new JLabel(back);
         panel.add(imgLabel);
