@@ -145,6 +145,22 @@ public class Client extends JFrame {
 	            getImage();
 	            
 	            
+	            /*
+	             btnOpen actionListener + imageView : recieve file from server
+	             
+	             protocol :
+	             
+	             31 : start connection
+	             13 : start file transmission
+	             sign - 0 : next file exist
+	             sign - 8 : end of connection
+	             
+	             
+	             */
+	            
+	            
+	            
+	            
 	            try {
 	               
 	               Oos.writeInt(31);
@@ -336,8 +352,6 @@ public class Client extends JFrame {
 	  private void getImage() 
 	   {
 	      this.imageView = new ImageView();
-	      
-	   
 	   }
 	   
 	   
@@ -397,23 +411,11 @@ public class Client extends JFrame {
 							Bis = new BufferedInputStream(filesenderSocket.getInputStream());
 							Dis = new DataInputStream(Bis);
 							Oos = new ObjectOutputStream(filesenderSocket.getOutputStream());
-							//Bos = new BufferedOutputStream;
-							
-							
-							/*filesenderSocket = new Socket(serverAddress, roomNum + 1);
-							fromBuffer = new BufferedInputStream(filesenderSocket.getInputStream());
-							Dis = new DataInputStream(fromBuffer);
-							os = new ObjectOutputStream(filesenderSocket.getOutputStream());*/
 						} else {
 							fileSocket = new Socket(serverAddress, roomNum + 1);
 							toServer = new BufferedOutputStream(fileSocket.getOutputStream());
 							dos = new DataOutputStream(fileSocket.getOutputStream());
 						}
-						//toBuffer = new BufferedOutputStream(File);
-						//toBuffer = new BufferedOutputStream(filesenderSocket.getOutputStream());
-						//BufferedOutputStream toBuffer;
-						//BufferedInputStream inBuffer;
-						// TODO 쓰레드 끝내기
 						new ChatThread().start(); // 채팅쓰레드 실행
 						
 					}
@@ -636,11 +638,6 @@ public class Client extends JFrame {
 		});
 
 	}
-	/*
-	 * protected static Object Client() {
-	 * 
-	 * return null; }
-	 */
 
 
 	public void ConnectSocket() throws IOException {
@@ -654,17 +651,6 @@ public class Client extends JFrame {
 
 		System.out.println("Connected!");
 
-		/*
-		 * while (true) { String line = in.readLine(); if
-		 * (line.startsWith("SUBMITNAME")) { //SUBMITNAME이름을 입력받았을때
-		 * out.println(getName()); } else if(line.startsWith("Entry")){ //사람이 입장하면 입장을
-		 * 알리는 부분 textArea_1.append(line.substring(5) + "\n"); } else if
-		 * (line.startsWith("NAMEACCEPTED")) { textField.setEditable(true); } else if
-		 * (line.startsWith("MESSAGE")) { //사람들의 MESSAGE를 모두에게 출력하라는 명령을 받는 부분
-		 * textArea_1.append(line.substring(8) + "\n"); } else
-		 * if(line.startsWith("Exit")){ //사람이 퇴장하면 퇴장을 알리는 부분
-		 * textArea_1.append(line.substring(4) + "\n"); } }
-		 */
 
 		getUserInfo();
 		System.out.println("after get user infor");
@@ -698,6 +684,10 @@ public class Client extends JFrame {
 	
 //================================================================= 채팅 쓰레드  ============================================================================================//
 	
+	
+	
+	
+	
 	public class ChatThread extends Thread { 
 		public void run() { 
 			try {
@@ -716,32 +706,49 @@ public class Client extends JFrame {
 	}
 
 	
+	/*
+	 : run() method
+	 
+	 sending user's file to Server
+	 
+	 protocol
+	 77 : sign for start file trasfer.
+	 66 : untrasmission file remain
+	 99 : end of transfer.
+	 
+	 */
+	
+	
 //	public class FileThread extends Thread {
 		public void run() {
 			int sign = 66;
 			try {
-				for(int i=0; i<egg.listA.size(); i++)
+				for(int i=0; i<egg.listA.size(); i++)   //egg.listA.size = number of File
 				 {
 				   toServer.write(77);
 				   toServer.flush();
 				
-					//프로토콜
-				   System.out.println(egg.listA.get(i));
+				
+				   System.out.println(egg.listA.get(i));  // egg.listA.get(i) = File path of i'th File
 				   File f = new File(egg.listA.get(i));
 				   fis = new FileInputStream(f);
 				   bis = new BufferedInputStream(fis);
 				   System.out.println(f.length() + "rec");
-				   dos.writeInt(bis.available());
+				   dos.writeInt(bis.available()); //send a file's size
 				   int ch =0;
 
+				   
+				   
 				   while ((ch = bis.read()) != -1 ) {
 					   toServer.write(ch);
-	               }
+	               }// transfer the file by byte unit until send all of byte.
+				   
+				   
 	               System.out.println("end\n");
 	               toServer.flush();
 	               
-	               if(i==egg.listA.size()-1)
-	            	   sign=99;
+	               if(i==egg.listA.size()-1) //last index of file.
+	            	   sign=99; // last file
 	               dos.write(sign);       
                 }
 				fis.close();
