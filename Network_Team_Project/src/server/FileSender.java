@@ -29,16 +29,24 @@ public class FileSender extends Room {
 		this.portNumber = port;
 	}
 
+	/*
+	 * <<< Explain the FileSender >>>
+	 * The FileSender is executed when the user reaches the agreed time.
+	 * And sends the files stored in the group- specific folder to the client again.
+	 * (non-Javadoc)
+	 * @see java.lang.Thread#run()
+	 */
 	public void run() {
-		int sender_pro = 101; // 시간이 일치 후 사용자가 방에 들어가면 보내주는 프로토콜
-		// int send_sign = 666;
+		int sender_pro = 101; // When the client enters the room after the time matches.
 		/*
 		 * 폴더에 저장되어 있는 파일 전부 보내기!
 		 */
 		try {
 
-			File file = new File("C:\\RE\\" + portNumber); // 각 그룹명으로 저장된 폴더
-
+			//Folder of port number assigned to group
+			File file = new File("C:\\RE\\" + portNumber); 
+			
+			// List of files stored in folder
 			File[] fileList = file.listFiles();
 			String filepath = null;
 
@@ -47,38 +55,42 @@ public class FileSender extends Room {
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 			System.out.println("FILE SENDER ROOM CONNECTED");
 
-			int threeone = fromClient.readInt();
+			// the protocol comes means the client is ready to receive.
+			int threeone = fromClient.readInt(); 
 			System.out.println("please 31 " + threeone);
 			
-			Dout.write(fileList.length); // 보내는 파일 개수 전송
-			int sign = 0;
+			Dout.write(fileList.length); // Send number of outgoing files
+			int sign = 0; 
+			
+			
 			for (int i = 0; i < fileList.length; i++) {
-				toClient_Re.write(sender_pro); // 프로토콜 전송 - 파일 간다는 신호
+				toClient_Re.write(sender_pro); // Protocol transfer - signal to file
 				toClient_Re.flush();
-				threeone = fromClient.readInt();
+				
+				threeone = fromClient.readInt(); // Means that the file was well received. 
 				System.out.println("please 13 "+ threeone);
 
-				File files = fileList[i];
-				filepath = files.getPath();
+				File files = fileList[i]; // file list in group's folder 
+				filepath = files.getPath(); // location that file saved
 
-				// Dout.writeUTF(filepath);
-				Fin = new FileInputStream(filepath);
+				Fin = new FileInputStream(filepath); 
 				Bin = new BufferedInputStream(Fin);
 				System.out.println(Bin.available());
-				Dout.writeInt(Bin.available());
+				Dout.writeInt(Bin.available()); // Send the file size
 
 				int bytesRead = 0;
+				
+				// Until file is read the file, write the byte to client
 				while ((bytesRead = Bin.read()) != -1) {
 					toClient_Re.write(bytesRead);
 				}
 				toClient_Re.flush();
 				Fin.close();
 				Bin.close();
-
-				// new Thread().sleep(1000);
+				
+				// sign that there are no more files to send
 				if (i == fileList.length - 1) {
 					sign = 8;
-
 				}
 				Dout.write(sign);
 				Dout.flush();

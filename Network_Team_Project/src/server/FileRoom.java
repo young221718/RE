@@ -12,65 +12,86 @@ import basic.Room;
 
 public class FileRoom extends Room {
 
-	// FileOutputStream out;
-	int cnt = 0;
+   // FileOutputStream out;
+   int cnt = 0;
 
-	public FileRoom(Socket socket) {
-		super(socket);
-	}
+   public FileRoom(Socket socket) {
+      super(socket);
+   }
 
-	public FileRoom(Socket socket, int port) {
-		super(socket);
-		this.portNumber = port;
-	}
+   public FileRoom(Socket socket, int port) {
+      super(socket);
+      this.portNumber = port;
+   }
 
-	public void run() {
-		int a = 0;
-		System.out.println("Enter the FileRoom!");
-		try {
-		
-			BufferedInputStream up = new BufferedInputStream(roomSocket.getInputStream());
-			DataInputStream fromClient = new DataInputStream(up);
+   /*
+    * <<<Explain The FileRoom>>
+    * After client enter the file room, FileRoom receives the protocol from the client.
+    * The client sends protocol '77' each time that it sends a file one by one.
+    * Every time FileRoom receives the protocol '77', FileRoom reads and saves the file.
+    * FileRoom reads the file during the protocol is 0.
+    * When the sign goes to '99', it means that there are no more files to read.
+    * The file that client send is stored in a folder created by the pin number of the room.
+    * Each file is stored with the user's email and index to avoid duplication.
+    * (non-Javadoc)
+    * @see java.lang.Thread#run()
+    */
+   public void run() {
+      int a = 0; // For counting file number
+      System.out.println("Enter the FileRoom!");
+      try {
+         // Used to receive data from customer.
+         BufferedInputStream up = new BufferedInputStream(roomSocket.getInputStream());
+         DataInputStream fromClient = new DataInputStream(up);
 
-			int sign = 0;
+         int sign = 0; // To send a sign to read the file.
 
-			String group_name = db.GetRoomName(portNumber);
-			
-			do {
-				int fPro = up.read(); // 프로토콜
+         do {
+            int fPro = up.read(); // Read the protocol that the client sends a picture
 
-				if (fPro == 77) {
-					int len = fromClient.readInt();
-					System.out.println(len + " received");
-					File f = new File("C:\\RE\\" + portNumber);
-					if (f.exists() == false)
-						f.mkdirs();// folderNN - 폴더, groupNB - group_id
+            if (fPro == 77) { // Client sends file
+               int len = fromClient.readInt(); // file's length
+               System.out.println(len + " received"); 
+               
+               // Create folder to save files according to group's port number
+               File f = new File("C:\\RE\\" + portNumber); 
+               
+               // Create folder that does not exist.
+               if (f.exists() == false)
+                  f.mkdirs();
 
-					FileOutputStream toFile = new FileOutputStream(f + "\\" + email + a + ".png");
-					BufferedOutputStream outFile = new BufferedOutputStream(toFile);
-					int ch = 0;
+               // Save each file without duplication by user's email and index 
+               FileOutputStream toFile = new FileOutputStream(f + "\\" + email + a + ".png");
+               
+               //Write the file using outFile
+               BufferedOutputStream outFile = new BufferedOutputStream(toFile);
+            
+               // It takes the for loop as much as the file length, receives it from the client, and stores it in the file.
+               for (int i = 0; i < len; i++) {
+                  outFile.write(up.read());
+               }
+               
+               // Read sign to check if any files are left
+               sign = fromClient.read();
+               
+               a++; // file index
+               
+               outFile.flush(); //If there is anything left in the buffer
+               outFile.close();
+            }
+         } while (sign != 99);
 
-					for (int i = 0; i < len; i++) {
-						outFile.write(up.read());
-					}
-					sign = fromClient.read();
-					a++;
-					outFile.flush();
-					outFile.close();
-				}
-			} while (sign != 99);
+      } catch (IOException e) {
+         e.printStackTrace();
+      } catch (Exception e) {
+         e.printStackTrace();
+      } finally {
+         try {
+            roomSocket.close();
+         } catch (IOException e) {
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				roomSocket.close();
-			} catch (IOException e) {
+         }
+      }
 
-			}
-		}
-
-	}
+   }
 }
