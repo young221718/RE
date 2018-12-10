@@ -12,17 +12,23 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 
+/**
+ * 
+ * 
+ * @author Á¶ÇýÁø
+ *
+ **/
+
 public class SecurityQnA extends JFrame {
 	
 	private Client QNA;
-
+	
 	public JPanel contentPane;
 	public JTextField textAnswer;
 	public JTextArea showingQ;
-
 	public JButton QNAConf;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) {  //Implement frame SecurityQnA
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -39,7 +45,7 @@ public class SecurityQnA extends JFrame {
 	public SecurityQnA() {
 		
 		setTitle("Security Question");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);  
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

@@ -29,12 +29,11 @@ public class JoinView extends JFrame {
 	public JButton btnConfirm;
 
 
-	public static void main(String[] args) {
+	public static void main(String[] args) { //Implement JoinView frame
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					JoinView frame = new JoinView();
-					//frame.setUndecorated(true);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -43,10 +42,10 @@ public class JoinView extends JFrame {
 		});
 	}
 
-	protected void setBorderPainted(boolean b) {
-		// TODO Auto-generated method stub
-		
-	}
+//	protected void setBorderPainted(boolean b) {
+//		// TODO Auto-generated method stub
+//		
+//	}
 
 	public JoinView() {
 		//setUndecorated(true);
@@ -54,7 +53,7 @@ public class JoinView extends JFrame {
 		/*색깔 후보*/ //(250,224,212)
 		
 		setTitle("Join");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(350, 295, 470, 300);  //왼쪽, 아래, 가로, 세로
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

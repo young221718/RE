@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,8 +18,11 @@ import java.io.LineNumberInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.math.RoundingMode;
 import java.net.Socket;
 import java.util.Calendar;
+
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -43,7 +47,7 @@ public class Client extends JFrame {
 	Socket socket; // waitingRoom socket
 	ImageView imageView;
 	// String serverAddress = getServerAddress();
-	String serverAddress = "192.168.1.136";
+	String serverAddress = "172.30.65.209";
 
 	ObjectInputStream inChat;
 	ObjectOutputStream outChat;
@@ -128,70 +132,71 @@ public class Client extends JFrame {
 		contentPane.add(scroll);
 		
 		btnOpen = new JButton("Open");
-		btnOpen.setBounds(218, 250, 106, 27);
-		contentPane.add(btnOpen);
-		btnOpen.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-				//서버한테 물어봐서 이미지 오는거 허락되면
-				//ImageView 실행
-		
-				
-				getImage();
-				
-				
-				try {
-					
-					Oos.writeInt(31);
-					Oos.flush();
-					int file_num = Bis.read();//그룹 폴더에 저장되어 있는 파일 갯수 
-					System.out.println("file_num: " + file_num);
-					//imageView.imageInByte = new byte[imageView.file_num][]; 
-					imageView.imageInByte = new byte[file_num][];
-					System.out.println("debug1");
-					int sign=0;
-					int j=0;
-					do {
-						
-						int pro = Bis.read();
-						System.out.println("sender_pro ");
-						if (pro == 101) {
-							Oos.writeInt(13);
-							Oos.flush();
-							int len = Dis.readInt();
-							
-							System.out.println(len + " received");
+	      btnOpen.setBounds(218, 250, 106, 27);
+	      contentPane.add(btnOpen);
+	      btnOpen.addActionListener(new ActionListener() {
+	         @Override
+	         public void actionPerformed(ActionEvent arg0) {
+	            
+	            //서버한테 물어봐서 이미지 오는거 허락되면
+	            //ImageView 실행
+	      
+	            
+	            getImage();
+	            
+	            
+	            try {
+	               
+	               Oos.writeInt(31);
+	               Oos.flush();
+	               int file_num = Bis.read();//그룹 폴더에 저장되어 있는 파일 갯수 
+	               System.out.println("file_num: " + file_num);
+	               //imageView.imageInByte = new byte[imageView.file_num][]; 
+	               imageView.imageInByte = new byte[file_num][];
+	               System.out.println("debug1");
+	               int sign=0;
+	               int j=0;
+	               do {
+	                  
+	                  int pro = Bis.read();
+	                  System.out.println("sender_pro ");
+	                  if (pro == 101) {
+	                     Oos.writeInt(13);
+	                     Oos.flush();
+	                     int len = Dis.readInt();
+	                     
+	                     System.out.println(len + " received");
 
-							
-								imageView.imageInByte[j] = new byte[len];
-								for (int i = 0; i < len; i++) {
-									imageView.imageInByte[j][i] = (byte)Bis.read();
-								}
-								//imageView.imageInByte[j] = buffer[j];
-								j++;
-							
-							sign = Dis.read();
-							System.out.println(sign);
-							//a++;
-							//outFile.flush();
-							//outFile.close();
-							//Bis.flush();
-							//Dis.close();
-						}
-					} while (sign != 8);
-					
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				
-				
-			}
-		
-	});
+	                     
+	                        imageView.imageInByte[j] = new byte[len];
+	                        for (int i = 0; i < len; i++) {
+	                           imageView.imageInByte[j][i] = (byte)Bis.read();
+	                        }
+	                        //imageView.imageInByte[j] = buffer[j];
+	                        j++;
+	                     
+	                     sign = Dis.read();
+	                     System.out.println(sign);
+	                     //a++;
+	                     //outFile.flush();
+	                     //outFile.close();
+	                     //Bis.flush();
+	                     //Dis.close();
+	                  }
+	               } while (sign != 8);
+	               
+	               
+	            } catch (IOException e) {
+	               // TODO Auto-generated catch block
+	               e.printStackTrace();
+	            }
+	            
+	            
+	            setIc();      
+	            
+	         }
+	      
+	   });
 
 		/*
 		 * contentPane.add(new JScrollPane(textArea_1)); textArea_1.setEditable(false);
@@ -205,6 +210,8 @@ public class Client extends JFrame {
 		public void actionPerformed(ActionEvent arg0) {
 				
 				run();
+
+				FileArea.setText("");
 
 			}
 
@@ -222,14 +229,25 @@ public class Client extends JFrame {
 					out.writeObject(roomNum); // 서버에게 방번호를 보내주는 부분
 					out.flush();
 					
-					getQnA();
+					if(in.readBoolean())
+					{
+						getQnA();
+						
+						String severQ = (String)in.readObject();
+						System.out.println(severQ);
+						System.out.println(in.readInt());
+	
+						securityQnA.showingQ.append(severQ);
+					}
+						
+					else
+					{
+						System.out.println("없는 방");
+						//TODO 에러창
+					}
 					
-					String severQ = (String)in.readObject();
-					System.out.println(severQ);
-					System.out.println(in.readInt());
-		
 					
-					securityQnA.showingQ.append(severQ);
+				
 					
 					
 					
@@ -301,7 +319,6 @@ public class Client extends JFrame {
 		
 		txtrPn = new JTextArea();      //서버한테 받은 핀번호가 보여지는 부분
 		txtrPn.setEditable(false);
-		// txtrPn.setText("Showing Pin Number");
 		txtrPn.setBounds(645, 20, 263, 38);
 		contentPane.add(txtrPn);
 	}
@@ -316,11 +333,25 @@ public class Client extends JFrame {
 	 */
 	//////////////////////////////////////////////////////////////이미지 프레임 /////////////////////////////////////
 	
-	private void getImage() 
-	{
-		this.imageView = new ImageView();
-		this.imageView.setVisible(true);
-	}
+	  private void getImage() 
+	   {
+	      this.imageView = new ImageView();
+	      
+	   
+	   }
+	   
+	   
+	   private void setIc()
+	   {
+	      try {
+	         this.imageView.img = ImageIO.read(new ByteArrayInputStream(imageView.imageInByte[imageView.index]));
+	      } catch (IOException e) {
+	         // TODO Auto-generated catch block
+	         e.printStackTrace();
+	      }
+	      this.imageView.ic.setImage(imageView.img);
+	      this.imageView.setVisible(true);
+	   }
 	
 //////////////////////////////////////////////////////////////////////// 보안 질문 프레임 ////////////////////////////////////////////////////////////////////////////////
 	
@@ -437,6 +468,7 @@ public class Client extends JFrame {
 						myChat.email = (String)in.readObject();
 						myChat.name = (String)in.readObject();
 						disposeLogin();
+						//REclient.setVisible(true);
 					}
 					else if(value == 183)
 					{
@@ -611,7 +643,7 @@ public class Client extends JFrame {
 	 */
 
 
-	private void ConnectSocket() throws IOException {
+	public void ConnectSocket() throws IOException {
 
 		// 유저로부터 인풋받기
 		// 서버와의 통신담당
@@ -640,27 +672,29 @@ public class Client extends JFrame {
 		// 이 밑으로는 프로토콜 코드 필요
 	}
 
-	public static void main(String[] args) throws Exception {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Client REclient = new Client();
-					
-					ImageIcon back  = new ImageIcon("wood2.PNG");  //배경이미지
-				    JLabel imgLabel  = new JLabel(back);
-				    REclient.add(imgLabel);
-				    imgLabel.setVisible(true);
-				    imgLabel.setBounds(-3, -20, 940, 665);
-					
-					REclient.setVisible(true);
-					REclient.ConnectSocket();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-
-	}
+//	public static void main(String[] args) throws Exception {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					
+//					//this.frame
+//					REclient = new Client();
+//					
+//					ImageIcon back  = new ImageIcon("wood2.PNG");  //배경이미지
+//				    JLabel imgLabel  = new JLabel(back);
+//				    this.add(imgLabel);
+//				    imgLabel.setVisible(true);
+//				    imgLabel.setBounds(-3, -20, 940, 665);
+//					
+//					REclient.setVisible(false);
+//					REclient.ConnectSocket();
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//
+//	}
 	
 //================================================================= 채팅 쓰레드  ============================================================================================//
 	
