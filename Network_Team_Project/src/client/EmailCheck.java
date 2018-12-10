@@ -2,15 +2,19 @@ package client;
 
 import java.util.regex.Pattern;
 
+/**
+ * This class is for email validation.
+The RE program should be notified by email when the type capsule is open.
+So it is important to get a valid e-mail address when registering.
+ * 
+ * 
+ * @author Á¶ÇýÁø
+ *
+ */
 
 public class EmailCheck {
 	public static void main(String[] args) {
-		String mail;
 		
-//		if(isEmail(mail)  == true)
-//			System.out.println("True");
-//		else
-//			System.out.println("False");
 	}
 
 

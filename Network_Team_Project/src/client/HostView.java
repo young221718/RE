@@ -40,16 +40,19 @@ public class HostView extends JFrame {
     }
  
     public HostView() {
+    	Color backColor = new Color(236,223,207);  //Set the background color of the frame
     	
         //frame setting
         setTitle("Create R;E");
         setSize(400, 260);
         setResizable(false);
         setLocation(400, 300);
+        
        
         
         JPanel panel = new JPanel();
         placeLoginPanel(panel);
+        panel.setBackground(backColor);   //배경색 바꾸는 부분
        
         
         add(panel);
@@ -59,50 +62,50 @@ public class HostView extends JFrame {
    
     public void placeLoginPanel(JPanel panel){
         panel.setLayout(null);     
-        JLabel userLabel = new JLabel("그룹 명");
-        userLabel.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 12));  //=========================== 글씨체 바꾸는 코드
+        JLabel userLabel = new JLabel("Group Name");
+        userLabel.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));  //=========================== 글씨체 바꾸는 코드
         userLabel.setForeground(Color.black);
-        userLabel.setBounds(55, 10, 80, 25);
+        userLabel.setBounds(50, 10, 80, 25);
         panel.add(userLabel);
        
-        JLabel userLabel3 = new JLabel("인원 수");
-        userLabel3.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 12));  //=========================== 글씨체 바꾸는 코드
+        JLabel userLabel3 = new JLabel("User Number");
+        userLabel3.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));  //=========================== 글씨체 바꾸는 코드
         userLabel3.setForeground(Color.black);
-        userLabel3.setBounds(55, 40, 80, 25);
+        userLabel3.setBounds(50, 40, 80, 25);
         panel.add(userLabel3);
         
-        JLabel userLabel4 = new JLabel("열릴 날짜");
-        userLabel4.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 12));  //=========================== 글씨체 바꾸는 코드
+        JLabel userLabel4 = new JLabel("Open Time");
+        userLabel4.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));  //=========================== 글씨체 바꾸는 코드
         userLabel4.setForeground(Color.black);
-        userLabel4.setBounds(55, 70, 80, 25);
+        userLabel4.setBounds(50, 70, 80, 25);
         panel.add(userLabel4);
         
-        JLabel userLabel5 = new JLabel("보안질문");
-        userLabel5.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 12));  //=========================== 글씨체 바꾸는 코드
+        JLabel userLabel5 = new JLabel("S-Question");
+        userLabel5.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));  //=========================== 글씨체 바꾸는 코드
         userLabel5.setForeground(Color.black);
         userLabel5.setBounds(50, 100, 80, 25);
         panel.add(userLabel5);
         
-        JLabel userLabel6= new JLabel("보안질문 답");
-        userLabel6.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 12));  //=========================== 글씨체 바꾸는 코드
+        JLabel userLabel6= new JLabel("SQ-Answer");
+        userLabel6.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));  //=========================== 글씨체 바꾸는 코드
         userLabel6.setForeground(Color.black);
-        userLabel6.setBounds(45, 130, 80, 25);
+        userLabel6.setBounds(50, 130, 80, 25);
         panel.add(userLabel6);
         
-        JLabel userLabel7 = new JLabel("년");
-        userLabel7.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 11));  //=========================== 글씨체 바꾸는 코드
+        JLabel userLabel7 = new JLabel("Y");
+        userLabel7.setFont(new Font("Berlin Sans FB Demi", Font.PLAIN, 11));  //=========================== 글씨체 바꾸는 코드
         userLabel7.setForeground(Color.black);
         userLabel7.setBounds(245, 70, 15, 25);
         panel.add(userLabel7);
         
-        JLabel userLabel8= new JLabel("월");
-        userLabel8.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 11));  //=========================== 글씨체 바꾸는 코드
+        JLabel userLabel8= new JLabel("M");
+        userLabel8.setFont(new Font("Berlin Sans FB Demi", Font.PLAIN, 11));  //=========================== 글씨체 바꾸는 코드
         userLabel8.setForeground(Color.black);
         userLabel8.setBounds(295, 70, 15, 25);
         panel.add(userLabel8);
         
-        JLabel userLabel9= new JLabel("일");
-        userLabel9.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 11));  //=========================== 글씨체 바꾸는 코드
+        JLabel userLabel9= new JLabel("D");
+        userLabel9.setFont(new Font("Berlin Sans FB Demi", Font.PLAIN, 11));  //=========================== 글씨체 바꾸는 코드
         userLabel9.setForeground(Color.black);
         userLabel9.setBounds(345, 70, 15, 25);
         panel.add(userLabel9);
@@ -151,6 +154,7 @@ public class HostView extends JFrame {
         
        
         btnInit = new JButton("Close");
+        btnInit.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 15));
         btnInit.setBounds(70, 175, 100, 25);
         panel.add(btnInit);
         btnInit.addActionListener(new ActionListener() {
@@ -162,6 +166,7 @@ public class HostView extends JFrame {
         });
        
         btnConfirm = new JButton("Confirm");
+        btnConfirm.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 15));
         btnConfirm.setBounds(230, 175, 100, 25);
         panel.add(btnConfirm);
                
