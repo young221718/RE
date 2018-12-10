@@ -83,7 +83,11 @@ public class WaitingRoom extends Room {
 					// read the room number which user want to enter
 					// check if the room can be entered or not
 					int PIN = (Integer) fromClient.readObject();
-					if (db.IsAlreadyUser(PIN, email) || db.IsPossibleEnterRoom(PIN)) {
+					// TODO: 없는 방이라는 프로토콜이 있어야함
+					boolean isPossible = db.IsPossibleEnterRoom(PIN) || db.IsAlreadyUser(PIN, email);
+					toClient.writeBoolean(isPossible);
+					toClient.flush();
+					if (isPossible) {
 						System.out.println("Possible"); // Possible case
 
 						// send room's question
@@ -118,7 +122,6 @@ public class WaitingRoom extends Room {
 							toClient.flush();
 						}
 					} else {
-						// TODO: 들어가지 못하다고 알리는 프로토콜
 						System.out.println("Not Possible");
 					}
 
