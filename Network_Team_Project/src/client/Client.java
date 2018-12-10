@@ -107,6 +107,11 @@ public class Client extends JFrame {
 
 	ImageIcon img = null;
 	
+	ImageIcon ROOM1 = new ImageIcon("ROOM1.PNG");
+	ImageIcon ROOM2 = new ImageIcon("ROOM2.PNG");
+	ImageIcon ENT1 = new ImageIcon("ENT1.PNG");
+	ImageIcon ENT2 = new ImageIcon("ENT2.PNG");
+	
 	public Client() {
 		info = new RoomInformation();
 		// data = new UserInfomation();
@@ -240,8 +245,9 @@ public class Client extends JFrame {
 
 		});
 	
-		JButton btnEntrance = new JButton("ENTRANCE");// 핀번호가 맞으면(TODO**맞는지 확인 : 보안질문으로??) -> 채팅방 입장
-		btnEntrance.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));
+		JButton btnEntrance = new JButton(ENT1);// 핀번호가 맞으면(TODO**맞는지 확인 : 보안질문으로??) -> 채팅방 입장
+		btnEntrance.setRolloverIcon(ENT2);
+		//btnEntrance.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));
 		btnEntrance.setBounds(558, 67, 106, 38);
 		btnEntrance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -295,8 +301,10 @@ public class Client extends JFrame {
 		txtPinNum.setColumns(10);
 		
 
-		JButton btnRoom = new JButton("ROOM"); // 방 만들기 버튼
-		btnRoom.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));
+		JButton btnRoom = new JButton(ROOM1); // 방 만들기 버튼
+		btnRoom.setRolloverIcon(ROOM2); // 버튼에 마우스가 올라갈떄 이미지 변환
+		btnRoom.setBorderPainted(false);
+		//btnRoom.setFont(new Font("Berlin Sans FB Demi", Font.BOLD, 13));
 		btnRoom.setBounds(558, 20, 79, 40);
 		btnRoom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
