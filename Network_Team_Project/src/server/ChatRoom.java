@@ -9,18 +9,43 @@ import java.util.HashMap;
 import basic.Chat;
 import basic.Room;
 
+/**
+ * ChatRoom Class
+ * 
+ * This class manage chat service.
+ * 
+ * @author Young
+ *
+ */
 public class ChatRoom extends Room {
 
 	private static HashMap<Integer, HashMap<String, ObjectOutputStream>> broadcaster = new HashMap<Integer, HashMap<String, ObjectOutputStream>>();
 	private Chat input;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param socket
+	 *            - connected socket
+	 */
 	public ChatRoom(Socket socket) {
 		super(socket);
 	}
 
+	/**
+	 * Constructor
+	 * 
+	 * @param socket
+	 *            - connected socket
+	 * @param port
+	 *            - room number
+	 * @param email
+	 *            - user's email
+	 */
 	public ChatRoom(Socket socket, int port, String email) {
 		super(socket);
 		this.portNumber = port;
+		// if broadcaster doesn't make the room map, make it
 		synchronized (broadcaster) {
 			if (!broadcaster.containsKey(portNumber)) {
 				broadcaster.put(portNumber, new HashMap<String, ObjectOutputStream>());
@@ -36,16 +61,13 @@ public class ChatRoom extends Room {
 			// Create character streams for the socket.
 			fromClient = new ObjectInputStream(roomSocket.getInputStream());
 			toClient = new ObjectOutputStream(roomSocket.getOutputStream());
-			
 
-			System.out.println("Chat stream connect");
-			System.out.println("port: " + portNumber);
-
+			// put the user's email and output stream in broadcast
 			synchronized (broadcaster) {
 				broadcaster.get(portNumber).put(email, toClient);
 			}
 
-			// broadcast enter
+			// broadcast enter the new client
 			input = new Chat();
 			input.email = "";
 			input.name = "";
@@ -57,9 +79,9 @@ public class ChatRoom extends Room {
 
 			System.out.println("ChatRoom Log 1");
 
-			while (true) {
-				input = (Chat)fromClient.readObject();
-//				input = ((Chat)fromClient.readObject());
+			// broadcast chat until socket connected
+			while (roomSocket.isConnected()) {
+				input = (Chat) fromClient.readObject();
 				System.out.println(input);
 				if (input == null) {
 					System.out.println("NULL");
@@ -69,7 +91,7 @@ public class ChatRoom extends Room {
 				for (ObjectOutputStream oos : broadcaster.get(portNumber).values()) {
 					oos.writeObject(input);
 					oos.flush();
-				}	
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -80,8 +102,12 @@ public class ChatRoom extends Room {
 			// writer from the sets, and close its socket.
 
 			try {
+				// close input and output stream
+				toClient.close();
+				fromClient.close();
+
 				// remove exit user
-				if (!broadcaster.get(portNumber).containsKey(email))
+				if (broadcaster.get(portNumber).containsKey(email))
 					broadcaster.get(portNumber).remove(email);
 
 				// broadcast exit
@@ -92,20 +118,18 @@ public class ChatRoom extends Room {
 					oos.writeObject(input);
 					oos.flush();
 				}
+				System.out.println("end chat debug 1");
 
 				// if hash map is empty free memory
 				synchronized (broadcaster) {
 					if (broadcaster.get(portNumber).isEmpty())
 						broadcaster.remove(portNumber);
 				}
-				
-				// close stream and socket
-				toClient.close();
-				fromClient.close();
+
+				// close socket
 				roomSocket.close();
-				
-				System.out.println("end Chat");
 			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 
